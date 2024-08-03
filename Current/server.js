@@ -62,15 +62,15 @@ app.post('/signin', (req, res) => {
 });
 
 app.post('/signup', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, firstName, lastName } = req.body;
   pool.connect()
     .then(client => {
       return bcrypt.hash(password, 10)
         .then(hashedPassword => {
-          return client.query('INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *', [email, hashedPassword])
+          return client.query('INSERT INTO users (email, password, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING *', [email, hashedPassword, firstName, lastName])
             .then(result => {
               client.release();
-              res.json({ message: 'Sign up successful.', user: result.rows[0] });
+              res.status(201).json({ message: 'Account created successfully.' });
             });
         })
         .catch(err => {
