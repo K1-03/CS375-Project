@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current - Sign In</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Current - Sign In</h2>
+        <form id="signInForm" onsubmit="event.preventDefault(); signIn();">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Sign In</button>
+            <div id="message"></div>
+        </form>
+        <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+    </div>
+    <script src="/javascript/auth.js"></script>
+</body>
+</html>
