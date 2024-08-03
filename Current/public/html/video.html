@@ -18,10 +18,27 @@
             <a href="/account"><img src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
         </div>
     </header>
-    <main>
-        <div class="video-player">
-            <!-- Video player goes here -->
+    <main class="main">
+        <div class="video-player" id="video-player">
         </div>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let urlParams = new URLSearchParams(window.location.search);
+            let videoId = urlParams.get('video');
+            let videoPlayer = document.getElementById('video-player');
+
+            if (videoId) {
+                let video = document.createElement('video');
+                video.src = `/videos/video_${videoId}.mp4`; // video name / src
+                video.controls = true;
+                video.style.maxWidth = '100%';
+                video.style.maxHeight = '100%';
+                videoPlayer.appendChild(video);
+            } else {
+                videoPlayer.innerHTML = '<p>No video specified.</p>';
+            }
+        });
+    </script>
 </body>
 </html>
