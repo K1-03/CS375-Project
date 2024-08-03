@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #282c34;
+    color: white;
+    padding: 10px 20px;
+}
+
+.home-button {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.header-center input {
+    width: 400px;
+    padding: 5px;
+}
+
+.header-right .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+}
+
+.thumbnail {
+    width: 200px;
+    cursor: pointer;
+}
