@@ -2,9 +2,6 @@ function signIn() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-
-    console.log('Sign In Request:', { email, password });
-
     fetch('/signin', {
         method: 'POST',
         headers: {
@@ -14,11 +11,14 @@ function signIn() {
     })
     .then(response => response.json())
     .then(result => {
-        console.log('Server Response:', result);
         document.getElementById('message').textContent = result.message;
+        if (result.redirect) {
+            window.location.href = result.redirect;
+        }
     })
     .catch(error => {
         console.error('Error:', error);
+        document.getElementById('message').textContent = 'An unexpected error occured.';
     });
 }
 
@@ -35,13 +35,11 @@ function signUp() {
         },
         body: JSON.stringify({ email, password, firstName, lastName })
     })
-    .then(response => {
-        if (response.status === 201) {
+    .then(response => response.json())
+    .then(result => {
+        document.getElementById('message').textContent = result.message;
+        if (result.message === 'Account created successfully.') {
             window.location.href = '/signin';
-        } else {
-            return response.json().then(result => {
-                document.getElementById('message').textContent = result.message;
-            });
         }
     })
     .catch(error => {
