@@ -42,6 +42,10 @@ app.get('/account', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'account.html'));
 });
 
+app.get('/upload', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
+});
+
 app.post("/upload", upload.single('v'), (req, res) =>{
   res.send('Video Uploaded.');
 });
