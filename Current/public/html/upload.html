@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current - Home</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <a href="/" class="home-button">Current</a>
+        </div>
+        <div class="header-right">
+            <a href="/account"><img src="/images/avatar-placeholder.png" alt="Avatar" class="avatar"></a>
+        </div>
+    </header>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="v" id="video" accept="video/*">
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
