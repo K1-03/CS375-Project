@@ -6,8 +6,35 @@ const pg = require('pg');
 const env = require("./env.json");
 const Pool = pg.Pool;
 const pool = new Pool(env);
+
+pool.connect().then(() => {
+  console.log("Connected to database");
+});
+
 let app = express();
 let port = 3000;
+const fs = require('fs');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'videos'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1804);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
+if (!fs.existsSync('videos')) {
+  fs.mkdir('videos', { recursive: true }, (err) => {
+    if (err) {
+      console.error('Error creating "videos" directory:', err);
+    } 
+  });
+} 
 
 app.use(bodyParser.json());
 // static files
@@ -24,6 +51,20 @@ app.get('/video', (req, res) => {
 
 app.get('/account', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'account.html'));
+});
+
+app.get('/upload', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
+});
+
+app.post("/upload", upload.single('v'), (req, res) =>{
+  let videoId = req.file.filename.split(".")[0];
+  let title = req.query.title;
+  let description = req.query.description;
+
+  pool.query("INSERT INTO video_information (vid, title, description, tags) VALUES ($1, $2, $3, $4)", [videoId, title, description, "temp"]);
+
+  res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
 });
 
 app.get('/signin', (req, res) => {
