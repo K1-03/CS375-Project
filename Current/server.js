@@ -2,7 +2,10 @@ let express = require('express');
 let path = require('path');
 let bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-const pool = require('./database');
+const pg = require('pg');
+const env = require("./env.json");
+const Pool = pg.Pool;
+const pool = new Pool(env);
 let app = express();
 let port = 3000;
 
