@@ -7,3 +7,10 @@ CREATE TABLE users (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE video_information (
+    videoID VARCHAR(64) PRIMARY KEY,
+    videoTitle VARCHAR(100) NOT NULL,
+    videoDescription VARCHAR(512) NOT NULL,
+    tags VARCHAR(9999) NOT NULL
+);

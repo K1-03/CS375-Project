@@ -1,14 +1,15 @@
-
+let express = require('express');
+let path = require('path');
 let bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const pg = require('pg');
 const env = require("./env.json");
-const fs = require('fs');
-const multer = require('multer');
 const Pool = pg.Pool;
 const pool = new Pool(env);
 let app = express();
 let port = 3000;
+const fs = require('fs');
+const multer = require('multer');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -16,7 +17,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1804);
-    cb(null, file.fieldname + '_' + uniqueSuffix + path.extname(file.originalname));
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
 
@@ -52,6 +53,12 @@ app.get('/upload', (req, res) => {
 });
 
 app.post("/upload", upload.single('v'), (req, res) =>{
+  let videoId = req.file.filename.split(".")[0];
+  let title = req.query.title;
+  let description = req.query.description;
+
+ 
+
   res.send('Video Uploaded.');
 });
 
