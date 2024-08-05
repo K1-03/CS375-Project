@@ -5,5 +5,7 @@ In env.json change the "user" to your postgres username and "password" to the re
 
 For homepage go to http://localhost:3000/ 
 
-For sign-in page go to http://localhost:3000/signin 
+For sign-in page go to http://localhost:3000/signin
+
+For upload page go to http://localhost:3000/upload
 
