@@ -8,12 +8,29 @@ video.addEventListener("change", () => {
 });
 
 document.getElementById('upload-form').addEventListener('submit', function (event) {
-    event.preventDefault();
+    event.preventDefault(); 
 
     let title = document.getElementById('title-input').value;
     let description = document.getElementById('description-input').value;
+
+    let formData = new FormData(this);
+    formData.append('title', title);
+    formData.append('description', description);
+
     let actionUrl = `/upload?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
 
-    this.action = actionUrl;
-    this.submit();
+    fetch(actionUrl, {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        setTimeout(() => {
+            window.location.href = data.redirectUrl;
+        }, 1000); 
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 });

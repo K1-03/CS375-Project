@@ -9,8 +9,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE video_information (
-    videoID VARCHAR(64) PRIMARY KEY,
-    videoTitle VARCHAR(100) NOT NULL,
-    videoDescription VARCHAR(512) NOT NULL,
+    vid VARCHAR(64) PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description VARCHAR(512) NOT NULL,
     tags VARCHAR(9999) NOT NULL
 );

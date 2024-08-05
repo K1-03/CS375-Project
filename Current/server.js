@@ -6,6 +6,11 @@ const pg = require('pg');
 const env = require("./env.json");
 const Pool = pg.Pool;
 const pool = new Pool(env);
+
+pool.connect().then(() => {
+  console.log("Connected to database");
+});
+
 let app = express();
 let port = 3000;
 const fs = require('fs');
@@ -57,9 +62,9 @@ app.post("/upload", upload.single('v'), (req, res) =>{
   let title = req.query.title;
   let description = req.query.description;
 
- 
+  pool.query("INSERT INTO video_information (vid, title, description, tags) VALUES ($1, $2, $3, $4)", [videoId, title, description, "temp"]);
 
-  res.send('Video Uploaded.');
+  res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
 });
 
 app.get('/signin', (req, res) => {
