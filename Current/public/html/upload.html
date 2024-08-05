@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Current - Home</title>
+    <title>Upload</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -12,12 +12,20 @@
             <a href="/" class="home-button">Current</a>
         </div>
         <div class="header-right">
-            <a href="/account"><img src="/images/avatar-placeholder.png" alt="Avatar" class="avatar"></a>
+            <a href="/account"><img src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
         </div>
     </header>
+    <div id="video-player" style = "padding-block: 20px;">
+        <video width="250" height="200" id="video" controls>
+        </video>
+    </div>
+    <div id="video-info">
+        <!--Video title, description, and tags can be entered here-->
+    </div>
     <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="v" id="video" accept="video/*">
-        <button type="submit">Upload</button>
+        <input type="file" name="v" id="choose-file" accept="video/*">
+        <button id="upload-button" type="submit">Upload</button>
     </form>
+    <script src="../javascript/upload.js"></script>
 </body>
 </html>
