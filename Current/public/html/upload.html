@@ -15,17 +15,31 @@
             <a href="/account"><img src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
         </div>
     </header>
-    <div id="video-player" style = "padding-block: 20px;">
-        <video width="250" height="200" id="video" controls>
-        </video>
+
+    <div style="border: 2px solid rgb(56, 56, 56); border-radius: 2px; padding: 10px; margin-top: 20px;">
+        <div style="display: flex; align-items: flex-start;">
+            <div id="video-player" style="margin-right: 20px;">
+                <video width="250" height="200" id="video" controls>
+                </video>
+            </div>
+            <div id="video-info">
+                <form>
+                    <div style="margin-bottom: 10px;">
+                        <label for="title">Video Title</label><br>
+                        <input type="text" id="title-input" name="title">
+                    </div>
+                    <div>
+                        <label for="description">Video Description</label><br>
+                        <input type="text" id="description-input" name="description">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <form action="/upload" method="post" enctype="multipart/form-data" style="margin-top: 10px;">
+            <input type="file" name="v" id="choose-file" accept="video/*">
+            <button id="upload-button" type="submit">Upload</button>
+        </form>
     </div>
-    <div id="video-info">
-        <!--Video title, description, and tags can be entered here-->
-    </div>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="v" id="choose-file" accept="video/*">
-        <button id="upload-button" type="submit">Upload</button>
-    </form>
     <script src="../javascript/upload.js"></script>
 </body>
 </html>
