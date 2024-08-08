@@ -16,12 +16,12 @@
         </div>
     </header>
 
-    <div id = "main">
-        <div id = video-preview>
+    <div id="main">
+        <div id="video-preview">
             <div id="video-player">
                 <video width="250" height="200" id="video" controls>
                 </video>
-        </div>
+            </div>
             <form>
                 <div id="video-info">
                     <label for="title">Video Title</label><br>
@@ -32,8 +32,13 @@
                 </div>
             </form>
         </div>
-        <form id = upload-form method="post" enctype="multipart/form-data">
-            <input type="file" name="v" id="choose-file" accept="video/*">
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <label for="choose-file">Choose Video File</label>
+            <input type="file" name="video" id="choose-video" accept="video/*">
+            <br><br>
+            <label for="choose-thumbnail">Choose Thumbnail Image</label>
+            <input type="file" name="thumbnail" id="choose-thumbnail" accept="image/*">
+            <br><br>
             <button id="upload" type="submit">Upload</button>
         </form>
     </div>

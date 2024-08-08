@@ -10,6 +10,7 @@ CREATE TABLE users (
 
 CREATE TABLE video_information (
     vid VARCHAR(64) PRIMARY KEY,
+    thumbnail VARCHAR(64),
     title VARCHAR(100) NOT NULL,
     description VARCHAR(512) NOT NULL,
     tags VARCHAR(9999) NOT NULL

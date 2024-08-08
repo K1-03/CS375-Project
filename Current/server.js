@@ -18,20 +18,38 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, 'videos'));
+      if (file.fieldname === 'video') {
+          cb(null, 'videos');
+      } else if (file.fieldname === 'thumbnail') {
+          cb(null, 'thumbnails');
+      }
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1804);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    if (file.fieldname == 'thumbnail'){
+      cb(null, "t-" + Date.now() + '_' + Math.round(Math.random() * 1804) + path.extname(file.originalname));
+    }
+    else{
+      cb(null, Date.now() + '_' + Math.round(Math.random() * 1804) + path.extname(file.originalname));
+    }
   }
 });
 
-const upload = multer({ storage: storage });
+
+
+const upload= multer({ storage: storage });
 
 if (!fs.existsSync('videos')) {
   fs.mkdir('videos', { recursive: true }, (err) => {
     if (err) {
       console.error('Error creating "videos" directory:', err);
+    } 
+  });
+} 
+
+if (!fs.existsSync('thumbnails')) {
+  fs.mkdir('thumbnails', { recursive: true }, (err) => {
+    if (err) {
+      console.error('Error creating "thumbnails" directory:', err);
     } 
   });
 } 
@@ -57,14 +75,25 @@ app.get('/upload', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
 });
 
-app.post("/upload", upload.single('v'), (req, res) =>{
-  let videoId = req.file.filename.split(".")[0];
-  let title = req.query.title;
-  let description = req.query.description;
+app.post("/upload",  upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), (req, res) =>{
+  let videoFile = req.files.video ? req.files.video[0] : null;
+  let thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
 
-  pool.query("INSERT INTO video_information (vid, title, description, tags) VALUES ($1, $2, $3, $4)", [videoId, title, description, "temp"]);
+  if (videoFile && thumbnailFile) {
+    let videoId = videoFile.filename.split(".")[0];
+    let thumbnailId = thumbnailFile.filename.split(".")[0];
 
-  res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
+    let title = req.query.title;
+    let description = req.query.description;
+
+    pool.query("INSERT INTO video_information (vid, thumbnail, title, description, tags) VALUES ($1, $2, $3, $4, $5)",
+      [videoId, thumbnailId, title, description, "temp"]);
+
+    res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
+ }
 });
 
 app.get('/signin', (req, res) => {

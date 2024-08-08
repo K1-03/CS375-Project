@@ -1,4 +1,4 @@
-let video = document.getElementById("choose-file");
+let video = document.getElementById("choose-video");
 
 video.addEventListener("change", () => {
     let videoPlayer = document.getElementById("video");
