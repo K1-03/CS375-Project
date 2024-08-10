@@ -40,10 +40,13 @@ header {
     border: 2px solid rgb(56, 56, 56); 
     border-radius: 2px; padding: 10px; 
     margin-top: 20px;
+    align-items: left;
 }
 
 #video-preview {
-    display: flex; align-items: flex-start;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 #video-player {
@@ -51,13 +54,38 @@ header {
 }
 
 input[type="text"]{
-    background-color: rgb(40, 39, 39); color: white; margin-bottom: 10px;
+    background-color: rgb(40, 39, 39); color: white; margin-bottom: 10px; margin-right: 0px;
 }
 
 #video-info{
     margin-bottom: 10px;
+    margin-left: 20px;
 }
 
 #upload-form{
     margin-top: 10px;
+}
+
+textarea {
+    width: 600px;
+    background-color: rgb(40, 39, 39);
+    color: white;
+    margin-bottom: 10px;
+    padding: 10px;
+    resize: none; /* Prevent resizing */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid rgb(56, 56, 56); 
+    border-radius: 4px;
+    box-sizing: border-box;
+    cursor: text;
+}
+
+.char-counter {
+    text-align: right;
+    font-size: 12px;
+    color: #a1a1a1;
+    margin-top: -10px;
+    margin-bottom: 10px;
 }

@@ -88,9 +88,16 @@ app.post("/upload",  upload.fields([
 
     let title = req.query.title;
     let description = req.query.description;
+    let tags = [...description.matchAll(/#([^\s#]+)/g)];
+    
+    let tagStr = tags[0][1];
+
+    for (let i = 1; i < tags.length; ++i){
+      tagStr += "#" + tags[i][1];
+    }
 
     pool.query("INSERT INTO video_information (vid, thumbnail, title, description, tags) VALUES ($1, $2, $3, $4, $5)",
-      [videoId, thumbnailId, title, description, "temp"]);
+      [videoId, thumbnailId, title, description, tagStr]);
 
     res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
  }

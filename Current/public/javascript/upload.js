@@ -1,5 +1,15 @@
 let video = document.getElementById("choose-video");
 
+document.getElementById('title-input').addEventListener('input', function() {
+    let titleLength = this.value.length;
+    document.getElementById('title-counter').innerText = `${titleLength}/80`;
+});
+
+document.getElementById('description-input').addEventListener('input', function() {
+    let descriptionLength = this.value.length;
+    document.getElementById('description-counter').innerText = `${descriptionLength}/500`;
+});
+
 video.addEventListener("change", () => {
     let videoPlayer = document.getElementById("video");
     
