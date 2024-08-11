@@ -78,7 +78,7 @@ app.get('/upload', (req, res) => {
 app.post("/upload",  upload.fields([
   { name: 'video', maxCount: 1 },
   { name: 'thumbnail', maxCount: 1 }
-]), (req, res) =>{
+]), async (req, res) =>{
   let videoFile = req.files.video ? req.files.video[0] : null;
   let thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
 
@@ -100,22 +100,45 @@ app.post("/upload",  upload.fields([
         tagStr += "#" + tags[i][1];
       }
     }
+    
+    try{
+      let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
 
-    pool.query("INSERT INTO video_information (vid, thumbnail, title, description, tags) VALUES ($1, $2, $3, $4, $5)",
-      [videoId, thumbnailId, title, description, tagStr]);
+      while(result.rows.length != 0){
+        newFilename = Date.now() + '_' + Math.round(Math.random() * 1804) + path.extname(videoFile.originalname);
+        fs.rename(videoFile.path, path.join(__dirname, "videos", newFilename));
+        videoId = newFilename.split(".")[0];
+        result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
+      }
 
-    res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
+      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, tags) VALUES ($1, $2, $3, $4, $5)",
+        [videoId, thumbnailId, title, description, tagStr]);
+
+      res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
+    }
+    catch(err){
+      res.status(500);
+      res.json({message: "Server error."})
+    }
  }
  else{
     let errorMsg = "";
     res.status(400);
+    
+    if (!thumbnailFile){
+      errorMsg += "Missing Thumbnail File\n";
+    }
+    
     if (!videoFile){
-      errorMsg += "Missing Video File\n";
+      errorMsg += "Missing Video File";
     }
 
-    if (!thumbnailFile){
-      errorMsg += "Missing Thumbnail Image";
-    }
+    if (videoFile){ try { fs.unlinkSync(videoFile.path); } catch (err) { 
+      console.error(`Failed to delete video file: ${err.message}`);
+    } }
+    if (thumbnailFile){ try { fs.unlinkSync(thumbnailFile.path); } catch (err) { 
+      console.error(`Failed to delete thumbnail file: ${err.message}`);
+    }  }
 
     res.json({ message: errorMsg});
  }
