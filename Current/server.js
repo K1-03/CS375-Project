@@ -19,9 +19,9 @@ const multer = require('multer');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
       if (file.fieldname === 'video') {
-          cb(null, 'videos');
+        cb(null, path.join('public', 'videos'));
       } else if (file.fieldname === 'thumbnail') {
-          cb(null, 'thumbnails');
+          cb(null, path.join('public', 'images', 'thumbnails'));
       }
   },
   filename: (req, file, cb) => {
@@ -34,25 +34,7 @@ const storage = multer.diskStorage({
   }
 });
 
-
-
 const upload= multer({ storage: storage });
-
-if (!fs.existsSync('videos')) {
-  fs.mkdir('videos', { recursive: true }, (err) => {
-    if (err) {
-      console.error('Error creating "videos" directory:', err);
-    } 
-  });
-} 
-
-if (!fs.existsSync('thumbnails')) {
-  fs.mkdir('thumbnails', { recursive: true }, (err) => {
-    if (err) {
-      console.error('Error creating "thumbnails" directory:', err);
-    } 
-  });
-} 
 
 app.use(bodyParser.json());
 // static files
