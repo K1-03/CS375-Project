@@ -26,10 +26,10 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     if (file.fieldname == 'thumbnail'){
-      cb(null, "t-" + Date.now() + '_' + Math.round(Math.random() * 1804) + path.extname(file.originalname));
+      cb(null, "t-" + Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(file.originalname));
     }
     else{
-      cb(null, Date.now() + '_' + Math.round(Math.random() * 1804) + path.extname(file.originalname));
+      cb(null, Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(file.originalname));
     }
   }
 });
@@ -105,8 +105,8 @@ app.post("/upload",  upload.fields([
       let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
 
       while(result.rows.length != 0){
-        newFilename = Date.now() + '_' + Math.round(Math.random() * 1804) + path.extname(videoFile.originalname);
-        fs.rename(videoFile.path, path.join(__dirname, "videos", newFilename));
+        newFilename = Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(videoFile.originalname);
+        fs.rename(videoFile.path, path.join(__dirname, "videos", newFilename), err => console.log(err));
         videoId = newFilename.split(".")[0];
         result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
       }
