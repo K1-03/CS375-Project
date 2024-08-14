@@ -1,18 +1,19 @@
 {
-  "name": "current",
-  "version": "1.0.0",
-  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node app/server.js",
+    "setup": "fly postgres connect -a currentvideos < setup.sql",
+    "start:dev": "env-cmd node app/server.js",
+    "setup:dev": "env-cmd psql -d postgres -f setup.sql"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "bcrypt": "^5.1.1",
-    "express": "^4.19.2",
-    "pg": "^8.12.0"
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "env-cmd": "^10.1.0",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.4.11"
   }
 }
