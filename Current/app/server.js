@@ -3,7 +3,7 @@ let path = require('path');
 let bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const pg = require('pg');
-const env = require("./env.json");
+const env = require("../env.json");
 const Pool = pg.Pool;
 const pool = new Pool(env);
 
