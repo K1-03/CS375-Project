@@ -1,7 +1,7 @@
 let express = require('express');
 let path = require('path');
 let bodyParser = require('body-parser');
-const bcrypt = require('bcrypt.js');
+const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
 const env = require('dotenv').config();
 let host;
