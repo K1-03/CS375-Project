@@ -1,5 +1,7 @@
-CREATE DATABASE current;
-\c current
+DROP DATABASE IF EXISTS currentvideos;
+
+CREATE DATABASE currentvideos;
+\c currentvideos
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
