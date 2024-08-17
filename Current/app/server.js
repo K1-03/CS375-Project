@@ -31,9 +31,9 @@ const multer = require('multer');
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
       if (file.fieldname === 'video') {
-        cb(null, path.join('public', 'videos'));
+        cb(null, path.join(__dirname,'public', 'videos'));
       } else if (file.fieldname === 'thumbnail') {
-          cb(null, path.join('public', 'images', 'thumbnails'));
+          cb(null, path.join(__dirname, 'public', 'images', 'thumbnails'));
       }
   },
   filename: (req, file, cb) => {
@@ -105,8 +105,8 @@ app.post("/upload",  upload.fields([
         result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
       }
 
-      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, tags) VALUES ($1, $2, $3, $4, $5)",
-        [videoId, thumbnailId, title, description, tagStr]);
+      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, userId, tags) VALUES ($1, $2, $3, $4, $5, $6)",
+        [videoId, thumbnailId, title, description, 1804, tagStr]);
 
       res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
     }

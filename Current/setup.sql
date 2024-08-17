@@ -15,5 +15,6 @@ CREATE TABLE video_information (
     thumbnail VARCHAR(64),
     title VARCHAR(100) NOT NULL,
     description VARCHAR(512) NOT NULL,
+    userId INTEGER,
     tags VARCHAR(9999) NOT NULL
 );
