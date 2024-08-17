@@ -1,18 +1,30 @@
 let express = require('express');
 let path = require('path');
 let bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
-const pg = require('pg');
-const env = require("../env.json");
-const Pool = pg.Pool;
-const pool = new Pool(env);
+const bcrypt = require('bcrypt.js');
+const { Pool } = require('pg');
+const env = require('dotenv').config();
+let host;
+let databaseConfig;
+
+if (process.env.NODE_ENV == "production"){
+  host = "0.0.0.0";
+  databaseConfig = { connectionString: process.env.DATABASE_URL };
+}
+else{
+  host = "localhost";
+  let { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT } = process.env;
+	databaseConfig = { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT };
+}
+
+let pool = new Pool(databaseConfig);
 
 pool.connect().then(() => {
   console.log("Connected to database");
 });
 
 let app = express();
-let port = 3000;
+let port = 8080;
 const fs = require('fs');
 const multer = require('multer');
 
