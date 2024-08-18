@@ -61,6 +61,44 @@ app.get('/video', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'video.html'));
 });
 
+app.get('/stream', (req, res) => {
+  res.sendFile(path.join(__dirname,'public', 'videos', req.query.file));
+});
+
+app.get('/video_info', async (req, res) =>{
+  try{
+    let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [req.query.vid]);
+
+    if (result.rows.length === 1){
+       let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
+        return element.includes(req.query.vid);
+       });
+
+       console.log(result.rows[0]);
+       console.log(result.rows[0].uploaddate);
+       
+       res.status(200);
+       res.json({
+        title: result.rows[0].title,
+        description: result.rows[0].description,
+        thumbnail: result.rows[0].thumbnail,
+        account: result.rows[0].userid,
+        tags:   result.rows[0].tags,
+        file: videoFileName,
+        uploadDate: result.rows[0].uploaddate
+    });
+    }
+    else{
+      res.status(404);
+      res.send(" Video Not Found :( ");
+    }
+  }
+  catch(error){
+    res.status(500);
+    res.send(error);
+  }
+});
+
 app.get('/account', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'account.html'));
 });
@@ -82,6 +120,7 @@ app.post("/upload",  upload.fields([
 
     let title = req.query.title;
     let description = req.query.description;
+    let uploadDate = new Date();
 
 
     let tags = [...description.matchAll(/#([^\s#]+)/g)];
@@ -105,14 +144,15 @@ app.post("/upload",  upload.fields([
         result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
       }
 
-      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, userId, tags) VALUES ($1, $2, $3, $4, $5, $6)",
-        [videoId, thumbnailId, title, description, 1804, tagStr]);
+      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, userId, tags, uploadDate)"
+        + "VALUES ($1, $2, $3, $4, $5, $6, $7)",
+        [videoId, thumbnailId, title, description, 1804, tagStr, uploadDate]);
 
       res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
     }
     catch(err){
       res.status(500);
-      res.json({message: "Server error."})
+      res.json({message: "Server error."});
     }
  }
  else{

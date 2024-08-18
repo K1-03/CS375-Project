@@ -12,9 +12,10 @@ CREATE TABLE users (
 
 CREATE TABLE video_information (
     vid VARCHAR(64) PRIMARY KEY,
-    thumbnail VARCHAR(64),
+    thumbnail VARCHAR(64) NOT NULL,
     title VARCHAR(100) NOT NULL,
     description VARCHAR(512) NOT NULL,
-    userId INTEGER,
-    tags VARCHAR(9999) NOT NULL
+    userId INTEGER NOT NULL,
+    tags VARCHAR(9999) NOT NULL,
+    uploadDate DATE NOT NULL
 );
