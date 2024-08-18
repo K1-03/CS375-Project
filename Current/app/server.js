@@ -1,12 +1,11 @@
 let express = require('express');
 let path = require('path');
 let bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs'); // just changed this to bcryptjs instead of bcrypt
+const bcrypt = require('bcryptjs'); // changed this to bcryptjs instead of bcrypt
 const { Pool } = require('pg');
 const env = require('dotenv').config();
 let host;
 let databaseConfig;
-//const Pool = pg.Pool;
 
 if (process.env.NODE_ENV == "production") {
 
