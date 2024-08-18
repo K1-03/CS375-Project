@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
             throw Error("Something Went Wrong")
         }
     })).then(data => {
+        /*"data" is just some json that contains the elements "rows" (rows from SQL query) and "length" (length of SQL sresult).
+        It really wasn't necessary to send the response from the server as json, but I did it out of convenience. Feel free to
+        have the server just send the result and then access the rows and rowCount attribute here instead.
+        */
         for (let i = data.length - 1; i >= 0; --i){
             thumbnails[data.length - i] = {id: data.rows[i].thumbnail, src: `/images/thumbnails/${data.rows[i].thumbnail}`, 
                                           link: `/video?vid=${data.rows[i].vid}`, title: `${data.rows[i].title}`}
