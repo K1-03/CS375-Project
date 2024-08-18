@@ -74,9 +74,6 @@ app.get('/video_info', async (req, res) =>{
         return element.includes(req.query.vid);
        });
 
-       console.log(result.rows[0]);
-       console.log(result.rows[0].uploaddate);
-       
        res.status(200);
        res.json({
         title: result.rows[0].title,

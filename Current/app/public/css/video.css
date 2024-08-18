@@ -1,10 +1,16 @@
+#video-player {
+    height: 500px;
+    width: 100vw;
+}
+
 #videoContent {
     height: 500px;
-    width: 1000px;
+    width: 100%;
 }
 
 #video-title{
     font-size: 24px;
+    margin-left: 10px;
     font-weight: bold;
 }
 
@@ -14,6 +20,8 @@
     border-style:solid;
     background-color:  #282c34;
     display: none;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 #description-text{
