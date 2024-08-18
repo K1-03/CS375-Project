@@ -1,5 +1,5 @@
 function signIn() {
-    const email = document.getElementById('email').value;
+    const emailOrUsername = document.getElementById('emailOrUsername').value;
     const password = document.getElementById('password').value;
 
     fetch('/signin', {
@@ -7,7 +7,7 @@ function signIn() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ emailOrUsername, password })
     })
     .then(response => response.json())
     .then(result => {
@@ -27,13 +27,14 @@ function signUp() {
     const password = document.getElementById('password').value;
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
+    const username = document.getElementById('username').value;
 
     fetch('/signup', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password, firstName, lastName })
+        body: JSON.stringify({ email, password, firstName, lastName, username })
     })
     .then(response => response.json())
     .then(result => {

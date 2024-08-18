@@ -2,6 +2,7 @@ let express = require('express');
 let path = require('path');
 let bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
+const cookieParser = require('cookie-parser');
 const { Pool } = require('pg');
 const env = require('dotenv').config();
 let host;
@@ -49,11 +50,13 @@ const storage = multer.diskStorage({
 const upload= multer({ storage: storage });
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 // static files
 app.use(express.static(path.join(__dirname, 'public')));
 
 // HTML files
 app.get('/', (req, res) => {
+  const userInfo = req.cookies.userInfo;
   res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
@@ -184,11 +187,19 @@ app.get ('/signup', (req, res) => {
 });
 
 app.post('/signin', (req, res) => {
-  const { email, password } = req.body;
+  const { emailOrUsername, password } = req.body;
+
   pool.connect((err, client, release) => {
     if (err) return res.status(500).json({ message: 'Server error' });
+
+    const isEmail = emailOrUsername.includes('@');
+    const query = isEmail ?
+      'SELECT * FROM users WHERE email = $1' :
+      'SELECT * FROM users WHERE username = $1';
+
+      const value = isEmail ? emailOrUsername.toLowerCase : emailOrUsername;
     
-    client.query('SELECT * FROM users WHERE email = $1', [email], (err, result) => {
+    client.query(query, [value], (err, result) => {
       release();
       if (err) return res.status(500).json({ message: 'Server error' });
       
@@ -197,24 +208,40 @@ app.post('/signin', (req, res) => {
         bcrypt.compare(password, user.password, (err, isValid) => {
           if (err) return res.status(500).json({ message: 'Server error' });
           if (isValid) {
+            res.cookie('userInfo', {
+              email: user.email,
+              firstName: user.first_name,
+              lastName: user.last_name,
+              username: user.username,
+              id: user.id
+            }, { httpOnly: true });
             res.json({ message: 'Sign in successful.', redirect: '/' });
           } else {
-            res.json({ message: 'Invalid email or password.' });
+            res.json({ message: 'Invalid email/username or password.' });
           }
         });
       } else {
-        res.json({ message: 'Invalid email or password.' });
+        res.json({ message: 'Invalid email/username or password.' });
       }
     });
   });
 });
 
 app.post('/signup', (req, res) => {
-  const { email, password, firstName, lastName } = req.body;
+  const { email, password, firstName, lastName, username } = req.body;
+
+  const usrenameRegex = /^[a-zA-Z0-9]+$/;
+
+  const lowerCaseEmail = email.toLowerCase();
+
+  if (!usrenameRegex.test(username)) {
+    return res.status(400).json({ message: 'Username can only contain letters and numbers.' });
+  }
+
   pool.connect((err, client, release) => {
     if (err) return res.status(500).json({ message: 'Server error' });
 
-    client.query('SELECT * FROM users WHERE email = $1', [email], (err, result) => {
+    client.query('SELECT * FROM users WHERE email = $1 OR username = $2', [lowerCaseEmail, username], (err, result) => {
       if (err) {
         release();
         return res.status(500).json({ message: 'Server error' });
@@ -222,7 +249,7 @@ app.post('/signup', (req, res) => {
 
       if (result.rows.length > 0) {
         release();
-        return res.status(409).json({ message: 'Account already exists.' });
+        return res.status(409).json({ message: 'Account with that email or username already exists.' });
       }
       
       bcrypt.hash(password, 10, (err, hashedPassword) => {
@@ -231,8 +258,8 @@ app.post('/signup', (req, res) => {
           return res.status(500).json({ message: 'Server error' });
         }
         client.query(
-          'INSERT INTO users (email, password, first_name, last_name) VALUES ($1, $2, $3, $4) RETURNING *', 
-          [email, hashedPassword, firstName, lastName],
+          'INSERT INTO users (email, password, first_name, last_name, username) VALUES ($1, $2, $3, $4, $5) RETURNING *', 
+          [lowerCaseEmail, hashedPassword, firstName, lastName, username],
           (err, result) => {
             release();
             if (err) return res.status(500).json({ message: 'Server error' });
