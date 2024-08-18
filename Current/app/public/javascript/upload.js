@@ -1,4 +1,14 @@
-let video = document.getElementById("choose-file");
+let video = document.getElementById("choose-video");
+
+document.getElementById('title-input').addEventListener('input', function() {
+    let titleLength = this.value.length;
+    document.getElementById('title-counter').innerText = `${titleLength}/80`;
+});
+
+document.getElementById('description-input').addEventListener('input', function() {
+    let descriptionLength = this.value.length;
+    document.getElementById('description-counter').innerText = `${descriptionLength}/500`;
+});
 
 video.addEventListener("change", () => {
     let videoPlayer = document.getElementById("video");
@@ -23,7 +33,16 @@ document.getElementById('upload-form').addEventListener('submit', function (even
         method: 'POST',
         body: formData,
     })
-    .then(response => response.json())
+    .then(response => {
+        if (response.ok){
+             return response.json();
+        }
+        else{
+            return response.json().then(err => {
+                throw new Error(err.message); 
+            });
+        }
+    })
     .then(data => {
         alert(data.message);
         setTimeout(() => {
@@ -31,6 +50,6 @@ document.getElementById('upload-form').addEventListener('submit', function (even
         }, 1000); 
     })
     .catch(error => {
-        console.error('Error:', error);
+        alert(error.message);
     });
 });

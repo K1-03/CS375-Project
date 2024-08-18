@@ -16,24 +16,32 @@
         </div>
     </header>
 
-    <div id = "main">
-        <div id = video-preview>
+    <div id="main">
+        <div id="video-preview">
             <div id="video-player">
-                <video width="250" height="200" id="video" controls>
+                <video width="600" height="400" id="video" controls>
                 </video>
-        </div>
+            </div>
             <form>
                 <div id="video-info">
                     <label for="title">Video Title</label><br>
-                    <input type="text" id="title-input" name="title">
+                    <textarea id="title-input" name="title" maxlength="80" style="height: 50px;"></textarea>
+                    <div id="title-counter" class="char-counter">0/80</div>
                     <br>
                     <label for="description">Video Description</label><br>
-                    <input type="text" id="description-input" name="description">
+                    <textarea id="description-input" name="description" maxlength="500" 
+                    placeholder="Describe your video here (type @ to link to accounts and use # to add tags)" style="height: 100px"></textarea>
+                    <div id="description-counter" class="char-counter">0/500</div> 
                 </div>
             </form>
         </div>
-        <form id = upload-form method="post" enctype="multipart/form-data">
-            <input type="file" name="v" id="choose-file" accept="video/*">
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <label for="choose-file">Choose Video File</label>
+            <input type="file" name="video" id="choose-video" accept="video/*">
+            <br><br>
+            <label for="choose-thumbnail">Choose Thumbnail Image</label>
+            <input type="file" name="thumbnail" id="choose-thumbnail" accept="image/*">
+            <br><br>
             <button id="upload" type="submit">Upload</button>
         </form>
     </div>

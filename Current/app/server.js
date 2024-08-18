@@ -1,24 +1,21 @@
 let express = require('express');
 let path = require('path');
 let bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs'); // just changed this to bcryptjs instead of bcrypt
+const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
 const { Pool } = require('pg');
 const env = require('dotenv').config();
 let host;
 let databaseConfig;
 
-if (process.env.NODE_ENV == "production") {
-
-	host = "0.0.0.0";
-	databaseConfig = { connectionString: process.env.DATABASE_URL };
-
-} else {
-
-	host = "localhost";
-	let { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT } = process.env;
+if (process.env.NODE_ENV == "production"){
+  host = "0.0.0.0";
+  databaseConfig = { connectionString: process.env.DATABASE_URL };
+}
+else{
+  host = "localhost";
+  let { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT } = process.env;
 	databaseConfig = { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT };
-
 }
 
 let pool = new Pool(databaseConfig);
@@ -34,23 +31,23 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, 'videos'));
+      if (file.fieldname === 'video') {
+        cb(null, path.join(__dirname,'public', 'videos'));
+      } else if (file.fieldname === 'thumbnail') {
+          cb(null, path.join(__dirname, 'public', 'images', 'thumbnails'));
+      }
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1804);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    if (file.fieldname == 'thumbnail'){
+      cb(null, "t-" + Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(file.originalname));
+    }
+    else{
+      cb(null, Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(file.originalname));
+    }
   }
 });
 
-const upload = multer({ storage: storage });
-
-if (!fs.existsSync('videos')) {
-  fs.mkdir('videos', { recursive: true }, (err) => {
-    if (err) {
-      console.error('Error creating "videos" directory:', err);
-    } 
-  });
-} 
+const upload= multer({ storage: storage });
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -67,6 +64,41 @@ app.get('/video', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'video.html'));
 });
 
+app.get('/stream', (req, res) => {
+  res.sendFile(path.join(__dirname,'public', 'videos', req.query.file));
+});
+
+app.get('/video_info', async (req, res) =>{
+  try{
+    let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [req.query.vid]);
+
+    if (result.rows.length === 1){
+       let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
+        return element.includes(req.query.vid);
+       });
+
+       res.status(200);
+       res.json({
+        title: result.rows[0].title,
+        description: result.rows[0].description,
+        thumbnail: result.rows[0].thumbnail,
+        account: result.rows[0].userid,
+        tags:   result.rows[0].tags,
+        file: videoFileName,
+        uploadDate: result.rows[0].uploaddate
+    });
+    }
+    else{
+      res.status(404);
+      res.send(" Video Not Found :( ");
+    }
+  }
+  catch(error){
+    res.status(500);
+    res.send(error);
+  }
+});
+
 app.get('/account', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'account.html'));
 });
@@ -75,14 +107,75 @@ app.get('/upload', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
 });
 
-app.post("/upload", upload.single('v'), (req, res) =>{
-  let videoId = req.file.filename.split(".")[0];
-  let title = req.query.title;
-  let description = req.query.description;
+app.post("/upload",  upload.fields([
+  { name: 'video', maxCount: 1 },
+  { name: 'thumbnail', maxCount: 1 }
+]), async (req, res) =>{
+  let videoFile = req.files.video ? req.files.video[0] : null;
+  let thumbnailFile = req.files.thumbnail ? req.files.thumbnail[0] : null;
 
-  pool.query("INSERT INTO video_information (vid, title, description, tags) VALUES ($1, $2, $3, $4)", [videoId, title, description, "temp"]);
+  if (videoFile && thumbnailFile) {
+    let videoId = videoFile.filename.split(".")[0];
+    let thumbnailId = thumbnailFile.filename.split(".")[0];
 
-  res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
+    let title = req.query.title;
+    let description = req.query.description;
+    let uploadDate = new Date();
+
+
+    let tags = [...description.matchAll(/#([^\s#]+)/g)];
+    let tagStr = "";
+
+    if (tags.length > 0){
+       tagStr = tags[0][1];
+
+      for (let i = 1; i < tags.length; ++i){
+        tagStr += "#" + tags[i][1];
+      }
+    }
+    
+    try{
+      let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
+
+      while(result.rows.length != 0){
+        newFilename = Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(videoFile.originalname);
+        fs.rename(videoFile.path, path.join(__dirname, "videos", newFilename), err => console.log(err));
+        videoId = newFilename.split(".")[0];
+        result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
+      }
+
+      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, userId, tags, uploadDate)"
+        + "VALUES ($1, $2, $3, $4, $5, $6, $7)",
+        [videoId, thumbnailId, title, description, 1804, tagStr, uploadDate]);
+
+      res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
+    }
+    catch(err){
+      res.status(500);
+      res.json({message: "Server error."});
+    }
+ }
+ else{
+    let errorMsg = "";
+    res.status(400);
+    
+    if (!thumbnailFile){
+      errorMsg += "Missing Thumbnail File\n";
+    }
+    
+    if (!videoFile){
+      errorMsg += "Missing Video File";
+    }
+
+    if (videoFile){ try { fs.unlinkSync(videoFile.path); } catch (err) { 
+      console.error(`Failed to delete video file: ${err.message}`);
+    } }
+    if (thumbnailFile){ try { fs.unlinkSync(thumbnailFile.path); } catch (err) { 
+      console.error(`Failed to delete thumbnail file: ${err.message}`);
+    }  }
+
+    res.json({ message: errorMsg});
+ }
 });
 
 app.get('/signin', (req, res) => {
