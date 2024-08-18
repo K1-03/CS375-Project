@@ -1,0 +1,26 @@
+#videoContent {
+    height: 500px;
+    width: 1000px;
+}
+
+#video-title{
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#description-box{
+    border-color: black;
+    border-width:2px;
+    border-style:solid;
+    background-color:  #282c34;
+    display: none;
+}
+
+#description-text{
+    margin-left: 5px;
+}
+
+#upload-date{
+    margin-left: 5px;
+    font-weight: bold;
+}
