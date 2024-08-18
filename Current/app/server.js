@@ -148,6 +148,10 @@ app.post("/upload",  upload.fields([
         + "VALUES ($1, $2, $3, $4, $5, $6, $7)",
         [videoId, thumbnailId, title, description, 1804, tagStr, uploadDate]);
 
+      pool.query("INSERT INTO video_insights (vid, views, likes, dislikes, numberOfComments)"
+        + "VALUES ($1, $2, $3, $4, $5)",
+        [videoId, 0, 0, 0, 0]);
+
       res.json({ message: 'Video uploaded successfully.', redirectUrl: '/account' });
     }
     catch(err){
