@@ -20,3 +20,20 @@ CREATE TABLE video_information (
     tags VARCHAR(9999) NOT NULL,
     uploadDate DATE NOT NULL
 );
+
+CREATE TABLE video_insights(
+    vid VARCHAR(64) PRIMARY KEY,
+    views INTEGER NOT NULL,
+    likes INTEGER NOT NULL,
+    dislikes INTEGER NOT NULL,
+    numberOfComments INTEGER NOT NULL
+);
+
+CREATE TABLE comments(
+    vid VARCHAR(64),
+    commentId SERIAL PRIMARY KEY,
+    userId INTEGER NOT NULL,
+    parentCommentId INTEGER, /*commentId of potential parent comment is replying to*/
+    content VARCHAR(512) NOT NULL,
+    timeCommented DATE NOT NULL
+)
