@@ -68,6 +68,26 @@ app.get('/stream', (req, res) => {
   res.sendFile(path.join(__dirname,'public', 'videos', req.query.file));
 });
 
+app.get('/newest_first', async (req, res) => {
+  try{
+    let result = await pool.query("SELECT * FROM video_information");
+
+    let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
+      return element.includes(req.query.vid);
+    });
+
+    res.status(200);
+    res.json({
+      rows: result.rows,
+      length: result.rowCount
+    });
+  }
+  catch(error){
+    res.status(500);
+    res.send(error);
+  }
+});
+
 app.get('/video_info', async (req, res) =>{
   try{
     let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [req.query.vid]);
@@ -116,7 +136,7 @@ app.post("/upload",  upload.fields([
 
   if (videoFile && thumbnailFile) {
     let videoId = videoFile.filename.split(".")[0];
-    let thumbnailId = thumbnailFile.filename.split(".")[0];
+    let thumbnailId = thumbnailFile.filename;
 
     let title = req.query.title;
     let description = req.query.description;

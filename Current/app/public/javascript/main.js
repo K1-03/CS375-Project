@@ -1,10 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
     let thumbnails = [
-        { id: "thumbnail_1", src: "/images/thumbnail_1.jpg", link: "/video?vid=1", title: "Video Title 1" },
-        { id: "thumbnail_2", src: "/images/thumbnail_2.jpg", link: "/video?vid=2", title: "Video Title 2" },
-        { id: "thumbnail_3", src: "/images/thumbnail_3.jpg", link: "/video?vid=3", title: "Video Title 3" },
-        { id: "thumbnail_4", src: "/images/thumbnail_4.jpg", link: "/video?vid=4", title: "Video Title 4" },
     ];
+
+    fetch("/newest_first").then((response => {
+        if (response.ok){
+            return response.json();
+        }
+        else{
+            throw Error("Something Went Wrong")
+        }
+    })).then(data => {
+        for (let i = data.length - 1; i >= 0; --i){
+            thumbnails[data.length - i] = {id: data.rows[i].thumbnail, src: `/images/thumbnails/${data.rows[i].thumbnail}`, 
+                                          link: `/video?vid=${data.rows[i].vid}`, title: `${data.rows[i].title}`}
+        }
+        displayThumbnails(thumbnails);
+    }).catch(err => {
+        console.log(err);//Something should be done here.
+    });
 
     let thumbnailsContainer = document.getElementById("thumbnails-container");
     let searchBar = document.getElementById("search-bar");
@@ -39,7 +52,4 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         displayThumbnails(filteredThumbnails);
     });
-
-    // Initial display of all thumbnails
-    displayThumbnails(thumbnails);
 });
