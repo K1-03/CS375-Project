@@ -57,6 +57,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // HTML files
 app.get('/', (req, res) => {
   const userInfo = req.cookies.userInfo;
+  if (userInfo) {
+    console.log(userInfo);
+  }
   res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
@@ -219,10 +222,10 @@ app.post('/signin', (req, res) => {
     const isEmail = emailOrUsername.includes('@');
     const query = isEmail ?
       'SELECT * FROM users WHERE email = $1' :
-      'SELECT * FROM users WHERE username = $1';
+      'SELECT * FROM users WHERE LOWER(username) = LOWER($1)';
 
-      const value = isEmail ? emailOrUsername.toLowerCase : emailOrUsername;
-    
+    const value = emailOrUsername.toLowerCase();
+
     client.query(query, [value], (err, result) => {
       release();
       if (err) return res.status(500).json({ message: 'Server error' });
@@ -255,8 +258,8 @@ app.post('/signup', (req, res) => {
   const { email, password, firstName, lastName, username } = req.body;
 
   const usrenameRegex = /^[a-zA-Z0-9]+$/;
-
   const lowerCaseEmail = email.toLowerCase();
+  const lowerCaseUsername = username.toLowerCase();
 
   if (!usrenameRegex.test(username)) {
     return res.status(400).json({ message: 'Username can only contain letters and numbers.' });
@@ -265,7 +268,7 @@ app.post('/signup', (req, res) => {
   pool.connect((err, client, release) => {
     if (err) return res.status(500).json({ message: 'Server error' });
 
-    client.query('SELECT * FROM users WHERE email = $1 OR username = $2', [lowerCaseEmail, username], (err, result) => {
+    client.query('SELECT * FROM users WHERE email = $1 OR LOWER(username) = $2', [lowerCaseEmail, lowerCaseUsername], (err, result) => {
       if (err) {
         release();
         return res.status(500).json({ message: 'Server error' });
