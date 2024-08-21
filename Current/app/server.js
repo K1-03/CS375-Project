@@ -63,6 +63,20 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
+app.get('/user_info', (req, res) => {
+  const userInfo = req.cookies.userInfo;
+  if (userInfo) {
+    res.json({ signedIn: true, userInfo: userInfo });
+  } else {
+    res.json({ signedIn: false });
+  }
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('userInfo');
+  res.json({ message: 'Logged out successfully.', redirect: '/' });
+});
+
 app.get('/video', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'video.html'));
 });
