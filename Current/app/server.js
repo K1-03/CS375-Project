@@ -56,10 +56,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // HTML files
 app.get('/', (req, res) => {
-  const userInfo = req.cookies.userInfo;
-  if (userInfo) {
-    console.log(userInfo);
-  }
   res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
@@ -89,6 +85,7 @@ app.get('/stream', (req, res) => {
 });
 
 app.post('/rate', async (req, res) => {
+  if (req.cookies.userId){
   try {
       let content = req.body;
       let userId = req.cookies.userInfo.id;
@@ -131,6 +128,11 @@ app.post('/rate', async (req, res) => {
   } catch (err) {
       console.error(err);
       res.status(500).send('An error occurred while updating the rating.');
+  }
+  }
+  else{
+    console.log("Must be signed in to rate.\n");//There should be some actual user feedback letting the user know they
+    //need to sign-in to rate a video.
   }
 });
 
@@ -193,7 +195,6 @@ app.get('/account', (req, res) => {
 
 app.get('/upload', (req, res) => {
   if (req.cookies.userInfo){
-    console.log(req.cookies);
     res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
   }
   else{
