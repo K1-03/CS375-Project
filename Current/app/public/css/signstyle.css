@@ -2,7 +2,11 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #121212;
+    color: #ffffff;
 }
 
 .container {
@@ -18,6 +22,7 @@ header {
     background-color: #282c34;
     color: white;
     padding: 10px 20px;
+    width: 100%;
 }
 
 .home-button {
@@ -37,27 +42,11 @@ header {
     border-radius: 50%;
 }
 
-.thumbnails {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-}
-
-.thumbnail {
-    width: 200px;
-    cursor: pointer;
-}
-
-h1 {
-    text-align: center;
-    color: #333;
-}
-
 form {
+    background-color: #282c34;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 form input[type="text"],
@@ -66,8 +55,11 @@ form input[type="email"] {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    background-color: rgb(40, 39, 39);
+    color: white;
+    border: 1px solid #575757;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 form input[type="submit"] {
@@ -86,12 +78,14 @@ form input[type="submit"]:hover {
 .signin,
 .signup {
     max-width: 400px;
-    margin: 0 auto;
+    margin: 20px auto;
 }
 
 .signin h1,
 .signup h1 {
-    color: #007bff;
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .error-message {
