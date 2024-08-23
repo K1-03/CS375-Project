@@ -56,10 +56,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // HTML files
 app.get('/', (req, res) => {
-  const userInfo = req.cookies.userInfo;
-  if (userInfo) {
-    console.log(userInfo);
-  }
   res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
@@ -82,8 +78,65 @@ app.get('/video', (req, res) => {
 });
 
 app.get('/stream', (req, res) => {
+  let id = req.query.file.split(".")[0];
+  pool.query("UPDATE video_insights SET views = views + 1 WHERE vid=($1)", [id]);
+  
   res.sendFile(path.join(__dirname,'public', 'videos', req.query.file));
 });
+
+app.post('/rate', async (req, res) => {
+  if (req.cookies.userId){
+  try {
+      let content = req.body;
+      let userId = req.cookies.userInfo.id;
+      let vid = content.vid;
+
+      // Check if the user has already rated the video
+      let result = await pool.query(
+          'SELECT * FROM ratings WHERE vid=$1 AND userId=$2',
+          [vid, userId]
+      );
+
+      if (result.rowCount === 0) {
+          await pool.query('INSERT INTO ratings (vid, userId, rating) VALUES ($1, $2, $3)', [vid, userId, content.rating]);
+          if (content.rating === 'like') {
+              await pool.query('UPDATE video_insights SET likes = likes + 1 WHERE vid=$1', [vid]);
+          } else if (content.rating === 'dislike') {
+              await pool.query('UPDATE video_insights SET dislikes = dislikes + 1 WHERE vid=$1', [vid] );
+          }
+      } else if (result.rowCount === 1 && result.rows[0].rating === content.rating){
+          await pool.query('DELETE FROM ratings WHERE vid=$1 AND userId=$2', [vid, userId] );
+          if (content.rating === 'like') {
+              await pool.query('UPDATE video_insights SET likes = likes - 1 WHERE vid=$1', [vid] );
+          } else if (content.rating === 'dislike') {
+              await pool.query('UPDATE video_insights SET dislikes = dislikes - 1 WHERE vid=$1', [vid]);
+          }
+      }
+      else{
+        await pool.query('DELETE FROM ratings WHERE vid=$1 AND userId=$2', [vid, userId] );
+        await pool.query('INSERT INTO ratings (vid, userId, rating) VALUES ($1, $2, $3)', [vid, userId, content.rating]);
+          if (content.rating === 'like') {
+              await pool.query('UPDATE video_insights SET likes = likes + 1 WHERE vid=$1', [vid] );
+              await pool.query('UPDATE video_insights SET dislikes = dislikes - 1 WHERE vid=$1', [vid] );
+          } else if (content.rating === 'dislike') {
+              await pool.query('UPDATE video_insights SET dislikes = dislikes + 1 WHERE vid=$1', [vid]);
+              await pool.query('UPDATE video_insights SET likes = likes - 1 WHERE vid=$1', [vid] );
+          }
+      }
+
+      res.status(200).send('Rating updated successfully.');
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('An error occurred while updating the rating.');
+  }
+  }
+  else{
+    console.log("Must be signed in to rate.\n");//There should be some actual user feedback letting the user know they
+    //need to sign-in to rate a video.
+  }
+});
+
+
 
 app.get('/newest_first', async (req, res) => {
   try{
@@ -141,7 +194,12 @@ app.get('/account', (req, res) => {
 });
 
 app.get('/upload', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
+  if (req.cookies.userInfo){
+    res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
+  }
+  else{
+    res.sendFile(path.join(__dirname, 'public', 'html', 'signin.html'));
+  }
 });
 
 app.post("/upload",  upload.fields([
@@ -154,6 +212,7 @@ app.post("/upload",  upload.fields([
   if (videoFile && thumbnailFile) {
     let videoId = videoFile.filename.split(".")[0];
     let thumbnailId = thumbnailFile.filename;
+    let userId = req.cookies.userInfo.id;
 
     let title = req.query.title;
     let description = req.query.description;
@@ -183,7 +242,7 @@ app.post("/upload",  upload.fields([
 
       pool.query("INSERT INTO video_information (vid, thumbnail, title, description, userId, tags, uploadDate)"
         + "VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        [videoId, thumbnailId, title, description, 1804, tagStr, uploadDate]);
+        [videoId, thumbnailId, title, description, userId, tagStr, uploadDate]);
 
       pool.query("INSERT INTO video_insights (vid, views, likes, dislikes, numberOfComments)"
         + "VALUES ($1, $2, $3, $4, $5)",

@@ -36,4 +36,10 @@ CREATE TABLE comments(
     parentCommentId INTEGER, /*commentId of potential parent comment is replying to*/
     content VARCHAR(512) NOT NULL,
     timeCommented DATE NOT NULL
-)
+);
+
+CREATE TABLE ratings(
+    vid VARCHAR(64),
+    userId INTEGER NOT NULL,
+    rating VARCHAR(7)
+);
