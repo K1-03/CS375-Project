@@ -1,3 +1,5 @@
+let videoId;
+
 function formatDate(date) {
     let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     let d = new Date(date);
@@ -8,9 +10,35 @@ function formatDate(date) {
     return `${month} ${day}, ${year}`;
 }
 
+document.getElementById("like").addEventListener("click", (event) => {
+    fetch('/rate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          rating: "like",
+          vid: videoId
+        })
+      });
+});
+
+document.getElementById("dislike").addEventListener("click", (event) => {
+    fetch('/rate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          rating: "dislike",
+          vid: videoId
+        })
+      });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     let urlParams = new URLSearchParams(window.location.search);
-    let videoId = urlParams.get('vid');
+    videoId = urlParams.get('vid');
     let videoPlayer = document.getElementById('video-player');
 
     if (videoId) {
@@ -33,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 document.getElementById("video-title").innerText = content.title;
                 document.getElementById("description-box").style.display = "block";
+                document.getElementById("insights").style.display = "block";
                 document.getElementById("upload-date").innerText = formatDate(content.uploadDate);
                 document.getElementById("description-text").innerText = content.description;
             }).catch(error => {
