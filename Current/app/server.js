@@ -130,6 +130,37 @@ app.get('/upload', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'upload.html'));
 });
 
+app.get('/signin', (req, res) => {
+  res.sendFile(path.join(__dirname,'public', 'html', 'signin.html'));
+});
+
+app.get ('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'html', 'signup.html'));
+});
+
+app.get('/:username', (req, res) => {
+  const username = req.params.username.toLowerCase();
+  const userInfo = req.cookies.userInfo;
+
+  console.log(userInfo);
+
+  if (userInfo && userInfo.username.toLowerCase() === username) {
+    res.sendFile(path.join(__dirname, 'public', 'html', 'channel.html'));
+  } else {
+    res.status(404).send('User not found');
+  }
+});
+
+app.get('/api/user-info', (req, res) => {
+  const userInfo = req.cookies.userInfo;
+
+  if (userInfo) {
+    res.json(userInfo);
+  } else {
+    res.status(404).json({ message: 'User not found' });
+  }
+});
+
 app.post("/upload",  upload.fields([
   { name: 'video', maxCount: 1 },
   { name: 'thumbnail', maxCount: 1 }
@@ -205,13 +236,6 @@ app.post("/upload",  upload.fields([
  }
 });
 
-app.get('/signin', (req, res) => {
-  res.sendFile(path.join(__dirname,'public', 'html', 'signin.html'));
-});
-
-app.get ('/signup', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'html', 'signup.html'));
-});
 
 app.post('/signin', (req, res) => {
   const { emailOrUsername, password } = req.body;
