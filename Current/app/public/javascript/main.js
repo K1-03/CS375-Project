@@ -1,26 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let thumbnails = [
-    ];
+    let thumbnails = [];
 
-    fetch("/newest_first").then((response => {
-        if (response.ok){
+    fetch("/newest_first").then(response => {
+        if (response.ok) {
             return response.json();
+        } else {
+            throw Error("Something Went Wrong");
         }
-        else{
-            throw Error("Something Went Wrong")
-        }
-    })).then(data => {
-        /*"data" is just some json that contains the elements "rows" (rows from SQL query) and "length" (length of SQL sresult).
-        It really wasn't necessary to send the response from the server as json, but I did it out of convenience. Feel free to
-        have the server just send the result and then access the rows and rowCount attribute here instead.
-        */
-        for (let i = data.length - 1; i >= 0; --i){
-            thumbnails[data.length - i] = {id: data.rows[i].thumbnail, src: `/images/thumbnails/${data.rows[i].thumbnail}`, 
-                                          link: `/video?vid=${data.rows[i].vid}`, title: `${data.rows[i].title}`}
+    }).then(data => {
+        for (let i = data.length - 1; i >= 0; --i) {
+            thumbnails[data.length - i] = {
+                id: data.rows[i].thumbnail,
+                src: `/images/thumbnails/${data.rows[i].thumbnail}`,
+                link: `/video?vid=${data.rows[i].vid}`,
+                title: `${data.rows[i].title}`
+            };
         }
         displayThumbnails(thumbnails);
     }).catch(err => {
-        console.log(err);//Something should be done here.
+        console.log(err);
     });
 
     let thumbnailsContainer = document.getElementById("thumbnails-container");
@@ -49,11 +47,55 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Fetch user info to update dropdown and display username
+    fetch("/user_info").then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw Error("Failed to retrieve user info.");
+        }
+    }).then(data => {
+        let dropdownMenu = document.getElementById("dropdown-menu");
+        let signinLink = document.getElementById("signin-link");
+        let usernameDisplay = document.getElementById("username-display");
+
+        if (data.signedIn) {
+            signinLink.style.display = "none"; // Hide 'Sign In' link
+            usernameDisplay.textContent = data.userInfo.username; // Display username
+            dropdownMenu.innerHTML = `
+                <a href="/account">Account</a>
+                <a href="/upload">Upload</a>
+                <a id="logout-link" href="#">Logout</a>
+            `;
+
+            // Add logout functionality
+            document.getElementById("logout-link").addEventListener("click", (event) => {
+                event.preventDefault();
+                fetch('/logout', {
+                    method: 'POST'
+                }).then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw Error("Failed to log out.");
+                    }
+                }).then(data => {
+                    alert(data.message);
+                    window.location.href = data.redirect; // Redirect to homepage
+                }).catch(err => {
+                    console.error(err);
+                });
+            });
+        }
+    }).catch(err => {
+        console.error(err);
+    });
+
+    // Search functionality
     searchBar.addEventListener("input", () => {
-        let searchText = searchBar.value.toLowerCase();
-        let filteredThumbnails = thumbnails.filter(thumbnail => 
-            thumbnail.title.toLowerCase().includes(searchText)
-        );
+        let filteredThumbnails = thumbnails.filter(thumbnail => {
+            return thumbnail.title.toLowerCase().includes(searchBar.value.toLowerCase());
+        });
         displayThumbnails(filteredThumbnails);
     });
 });
