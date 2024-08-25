@@ -8,7 +8,8 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
-    username VARCHAR(255) UNIQUE NOT NULL
+    username VARCHAR(255) UNIQUE NOT NULL,
+    profile_picture VARCHAR(255)
 );
 
 CREATE TABLE video_information (

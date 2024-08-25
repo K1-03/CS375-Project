@@ -30,10 +30,21 @@ header {
     padding: 5px;
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-right #username {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
 .header-right .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 #main {

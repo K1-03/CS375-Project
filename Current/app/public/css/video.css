@@ -32,3 +32,20 @@
     margin-left: 5px;
     font-weight: bold;
 }
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-right #username, .header-right #username-display {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.header-right .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
