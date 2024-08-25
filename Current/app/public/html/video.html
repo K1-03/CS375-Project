@@ -12,11 +12,9 @@
         <div class="header-left">
             <a href="/" class="home-button">Current</a>
         </div>
-        <div class="header-center">
-            <input type="text" placeholder="Search" id="search-bar">
-        </div>
         <div class="header-right">
-            <a href="/account"><img src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
+            <span id="username"></span>
+            <a href="/html/account.html"><img id="avatar" src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
         </div>
     </header>
     <main class="main">
@@ -34,5 +32,21 @@
         </div>
     </main>
     <script src="/javascript/video.js"></script>
+    <script>
+        // Fetch user info and update avatar and username
+        async function updateUserInfo() {
+            try {
+                let response = await fetch('/user_info');
+                let data = await response.json();
+                if (data.signedIn) {
+                    document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+                    document.getElementById('username').textContent = data.userInfo.username || 'Guest';
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        }
+        updateUserInfo();
+    </script>
 </body>
 </html>

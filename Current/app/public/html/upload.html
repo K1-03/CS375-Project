@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current - Upload</title>
     <link rel="stylesheet" href="/css/upload.css">
 </head>
+
 <body>
     <header>
         <div class="header-left">
             <a href="/" class="home-button">Current</a>
         </div>
         <div class="header-right">
-            <a href="/account"><img src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
+            <span id="username" class="user-info">Username</span>
+            <a href="/account"><img id="avatar" src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
         </div>
     </header>
 
@@ -29,14 +32,15 @@
                     <div id="title-counter" class="char-counter">0/80</div>
                     <br>
                     <label for="description">Video Description</label><br>
-                    <textarea id="description-input" name="description" maxlength="500" 
-                    placeholder="Describe your video here (type @ to link to accounts and use # to add tags)" style="height: 100px"></textarea>
-                    <div id="description-counter" class="char-counter">0/500</div> 
+                    <textarea id="description-input" name="description" maxlength="500"
+                        placeholder="Describe your video here (type @ to link to accounts and use # to add tags)"
+                        style="height: 100px"></textarea>
+                    <div id="description-counter" class="char-counter">0/500</div>
                 </div>
             </form>
         </div>
         <form id="upload-form" method="post" enctype="multipart/form-data">
-            <label for="choose-file">Choose Video File</label>
+            <label for="choose-video">Choose Video File</label>
             <input type="file" name="video" id="choose-video" accept="video/*">
             <br><br>
             <label for="choose-thumbnail">Choose Thumbnail Image</label>
@@ -46,5 +50,22 @@
         </form>
     </div>
     <script src="/javascript/upload.js"></script>
+    <script>
+        // Fetch user info and update avatar and username
+        async function updateUserInfo() {
+            try {
+                let response = await fetch('/user_info');
+                let data = await response.json();
+                if (data.signedIn) {
+                    document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+                    document.getElementById('username').textContent = data.userInfo.username || 'Guest';
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        }
+        updateUserInfo();
+    </script>
 </body>
+
 </html>
