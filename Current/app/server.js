@@ -144,7 +144,7 @@ app.get('/stream', (req, res) => {
 });
 
 app.post('/rate', async (req, res) => {
-  if (req.cookies.userId){
+  if (req.cookies.userInfo){
   try {
       let content = req.body;
       let userId = req.cookies.userInfo.id;
@@ -190,6 +190,7 @@ app.post('/rate', async (req, res) => {
   }
   }
   else{
+    console.log(req.cookies);
     console.log("Must be signed in to rate.\n");//There should be some actual user feedback letting the user know they
     //need to sign-in to rate a video.
   }
@@ -245,6 +246,27 @@ app.get('/video_info', async (req, res) =>{
   catch(error){
     res.status(500);
     res.send(error);
+  }
+});
+
+app.get('/video_insights', async (req, res) => {
+  const videoId = req.query.vid;
+
+  if (!videoId) {
+      return res.status(400).send('Video ID is required');
+  }
+
+  try {
+      const insights = await pool.query('SELECT views, likes, dislikes FROM video_insights WHERE vid = $1', [videoId]);
+
+      if (insights.rows.length > 0) {
+          res.json(insights.rows[0]);
+      } else {
+          res.status(404).send('Video insights not found');
+      }
+  } catch (err) {
+      console.error('Error retrieving video insights:', err);
+      res.status(500).send('Internal server error');
   }
 });
 
