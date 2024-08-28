@@ -1,3 +1,16 @@
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/user_info')
+        .then(response => response.json())
+        .then(data => {
+            if (data.signedIn) {
+                const userInfo = data.userInfo;
+                document.getElementById('username-display').textContent = userInfo.username;
+                document.getElementById('avatar-display').src = userInfo.profilePicture;
+            }
+        })
+        .catch(error => console.error('Error fetching user info:', error));
+});
+
 let video = document.getElementById("choose-video");
 
 document.getElementById('title-input').addEventListener('input', function() {

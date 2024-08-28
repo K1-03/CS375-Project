@@ -12,7 +12,8 @@
             <a href="/" class="home-button">Current</a>
         </div>
         <div class="header-right">
-            <a href="/html/account.html"><img src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
+            <span id="username"></span>
+            <a href="/html/account.html"><img id="avatar" src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
         </div>
     </header>
     <main class="account-main">
@@ -20,10 +21,52 @@
             <a href="/upload">Upload</a>
         </div>
         <div class="account-content">
-            
             <h1>Account Information</h1>
             <p>Welcome to your account page.</p>
+            <form id="account-form" action="/update_account" method="POST" enctype="multipart/form-data">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required><br>
+                
+                <label for="password">New Password:</label>
+                <input type="password" id="password" name="password"><br>
+                
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required><br>
+                
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required><br>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required><br>
+                
+                <label for="profilePicture">Profile Picture:</label>
+                <input type="file" id="profilePicture" name="profilepicture" accept="image/*">
+                
+                <button type="submit">Update Account</button>
+            </form>
         </div>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/user_info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.signedIn) {
+                        document.getElementById('username').textContent = data.userInfo.username;
+                        document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+                        document.getElementById('username').textContent = data.userInfo.username;
+
+                        // Pre-fill the form fields with the current user info
+                        document.getElementById('username').value = data.userInfo.username;
+                        document.getElementById('firstName').value = data.userInfo.firstName;
+                        document.getElementById('lastName').value = data.userInfo.lastName;
+                        document.getElementById('email').value = data.userInfo.email;
+                    } else {
+                        window.location.href = '/signin'; // Redirect to sign-in if not signed in
+                    }
+                })
+                .catch(error => console.error('Error fetching user info:', error));
+        });
+    </script>
 </body>
 </html>

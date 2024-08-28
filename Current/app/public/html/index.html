@@ -15,9 +15,9 @@
             <input type="text" placeholder="Search" id="search-bar">
         </div>
         <div class="header-right">
+            <span id="username-display"></span>
             <div class="dropdown">
-                <span id="username-display"></span> <!-- Span to display username -->
-                <img src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar dropdown-toggle">
+                <img id="avatar" src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar dropdown-toggle">
                 <div class="dropdown-menu" id="dropdown-menu">
                     <a href="/html/signin.html" id="signin-link">Sign In</a>
                 </div>
@@ -29,5 +29,25 @@
         </div>
     </main>
     <script src="/javascript/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/user_info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.signedIn) {
+                        document.getElementById('username-display').textContent = data.userInfo.username;
+                        document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+
+                        // Update dropdown menu based on sign-in status
+                        document.getElementById('signin-link').style.display = 'none';
+                    } else {
+                        document.getElementById('username-display').textContent = '';
+                        document.getElementById('avatar').src = '/images/Placeholder_Profile_Image.jpg';
+                        document.getElementById('signin-link').style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error fetching user info:', error));
+        });
+    </script>
 </body>
 </html>
