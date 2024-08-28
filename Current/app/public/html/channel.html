@@ -8,16 +8,27 @@
 </head>
 <body>
     <div class="channel-container">
-        <div class="channel-header">
-            <h1 id="user-name"></h1>
-            <p id="user-username"></p>
-        </div>
-        <div class="channel-menu">
+        <div class="channel-sidebar">
             <ul>
                 <li><a href="/upload">Upload</a></li>
+                <li><a href="/profile">Profile</a></li>
+                <li><a href="/settings">Settings</a></li>
             </ul>
         </div>
         <div class="channel-content">
+            <div class="channel-header">
+                <h1 id="user-name"></h1>
+                <p id="user-username"></p>
+            </div>
+            <div class="channel-tabs">
+                <ul>
+                    <li><a href="#" id="home-tab">Home</a></li>
+                    <li><a href="#">Videos</a></li>
+                </ul>
+            </div>
+            <div class="tab-content" id="tab-content">
+            </div>
+            <div id="videos-container"></div>
         </div>
     </div>
     <script src="/javascript/channel.js"></script>

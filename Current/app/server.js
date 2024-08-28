@@ -210,6 +210,28 @@ app.get ('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'signup.html'));
 });
 
+app.get('/user_videos', (req, res) => {
+  const userId = req.cookies.userInfo.id;
+  console.log('Received userId:', userId);
+  if (!userId) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
+  const query = 'SELECT * FROM video_information WHERE userid = $1 ORDER BY uploaddate DESC';
+
+  pool.query(query, [userId], (err, result) => {
+      if (err) {
+        console.error('Error executing query', err.stack);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.json(result);
+    });
+});
+
+// MAKE SURE THIS IS THE LAST GET REQUEST AS
+// IT WILL INTERFERE WITH OTHER GET REQUESTS OTHERWISE
 app.get('/:username', (req, res) => {
   const username = req.params.username.toLowerCase();
   const userInfo = req.cookies.userInfo;
@@ -220,16 +242,6 @@ app.get('/:username', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'html', 'channel.html'));
   } else {
     res.status(404).send('User not found');
-  }
-});
-
-app.get('/api/user-info', (req, res) => {
-  const userInfo = req.cookies.userInfo;
-
-  if (userInfo) {
-    res.json(userInfo);
-  } else {
-    res.status(404).json({ message: 'User not found' });
   }
 });
 
