@@ -85,7 +85,7 @@ app.get('/stream', (req, res) => {
 });
 
 app.post('/rate', async (req, res) => {
-  if (req.cookies.userId){
+  if (req.cookies.userInfo){
   try {
       let content = req.body;
       let userId = req.cookies.userInfo.id;
