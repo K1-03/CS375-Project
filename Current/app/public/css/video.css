@@ -24,8 +24,31 @@
     margin-right: 10px;
 }
 
-#insights{
-    display: none;
+#insights {
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+#insights-data {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#insights span {
+    font-weight: bold;
+}
+
+#insights-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#insights-buttons button {
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 #description-text{
@@ -35,4 +58,21 @@
 #upload-date{
     margin-left: 5px;
     font-weight: bold;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-right #username, .header-right #username-display {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.header-right .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
 }

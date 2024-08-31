@@ -31,17 +31,22 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      if (file.fieldname === 'video') {
-        cb(null, path.join(__dirname,'public', 'videos'));
-      } else if (file.fieldname === 'thumbnail') {
-          cb(null, path.join(__dirname, 'public', 'images', 'thumbnails'));
-      }
+    if (file.fieldname === 'video') {
+      cb(null, path.join(__dirname, 'public', 'videos'));
+    } else if (file.fieldname === 'thumbnail') {
+      cb(null, path.join(__dirname, 'public', 'images', 'thumbnails'));
+    } else if (file.fieldname === 'profilepicture') {
+      cb(null, path.join(__dirname, 'public', 'images', 'profilepictures'));
+    } else {
+      cb(new Error('Invalid field name'), false);
+    }
   },
   filename: (req, file, cb) => {
-    if (file.fieldname == 'thumbnail'){
+    if (file.fieldname === 'thumbnail') {
       cb(null, "t-" + Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(file.originalname));
-    }
-    else{
+    } else if (file.fieldname === 'profilepicture') {
+      cb(null, "profile-" + Date.now() + path.extname(file.originalname));
+    } else {
       cb(null, Date.now() + '_' + Math.round(Math.random() * 99999) + path.extname(file.originalname));
     }
   }
@@ -71,6 +76,60 @@ app.get('/user_info', (req, res) => {
 app.post('/logout', (req, res) => {
   res.clearCookie('userInfo');
   res.json({ message: 'Logged out successfully.', redirect: '/' });
+});
+
+app.post('/update_account', upload.fields([
+  { name: 'profilepicture', maxCount: 1 }
+]), async (req, res) => {
+  const { username, password, firstName, lastName, email } = req.body;
+  const userInfo = req.cookies.userInfo;
+
+  try {
+    let client = await pool.connect();
+
+    let query = 'SELECT * FROM users WHERE (LOWER(username) = LOWER($1) OR email = $2) AND id != $3';
+    let result = await client.query(query, [username.toLowerCase(), email.toLowerCase(), userInfo.id]);
+
+    if (result.rows.length > 0) {
+      return res.status(409).json({ message: 'Username or email already exists.' });
+    }
+
+    let updateQuery = 'UPDATE users SET username = $1, first_name = $2, last_name = $3, email = $4';
+    let params = [username, firstName, lastName, email];
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateQuery += ', password = $5';
+      params.push(hashedPassword);
+    }
+
+    if (req.files && req.files.profilepicture) {
+      const profilePicturePath = `/images/profilepictures/${req.files.profilepicture[0].filename}`;
+      updateQuery += ', profile_picture = $6';
+      params.push(profilePicturePath);
+    }
+
+    updateQuery += ' WHERE id = $' + (params.length + 1);
+    params.push(userInfo.id);
+
+    await client.query(updateQuery, params);
+
+    
+    res.cookie('userInfo', {
+      ...userInfo,
+      username: username,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      profilePicture: req.files && req.files.profilepicture ? `/images/profilepictures/${req.files.profilepicture[0].filename}` : userInfo.profilePicture
+    }, { httpOnly: true });
+
+    res.redirect('/account');
+
+  } catch (err) {
+    console.error('Error updating account:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 app.get('/video', (req, res) => {
@@ -131,6 +190,7 @@ app.post('/rate', async (req, res) => {
   }
   }
   else{
+    console.log(req.cookies);
     console.log("Must be signed in to rate.\n");//There should be some actual user feedback letting the user know they
     //need to sign-in to rate a video.
   }
@@ -186,6 +246,27 @@ app.get('/video_info', async (req, res) =>{
   catch(error){
     res.status(500);
     res.send(error);
+  }
+});
+
+app.get('/video_insights', async (req, res) => {
+  const videoId = req.query.vid;
+
+  if (!videoId) {
+      return res.status(400).send('Video ID is required');
+  }
+
+  try {
+      const insights = await pool.query('SELECT views, likes, dislikes FROM video_insights WHERE vid = $1', [videoId]);
+
+      if (insights.rows.length > 0) {
+          res.json(insights.rows[0]);
+      } else {
+          res.status(404).send('Video insights not found');
+      }
+  } catch (err) {
+      console.error('Error retrieving video insights:', err);
+      res.status(500).send('Internal server error');
   }
 });
 
@@ -313,7 +394,8 @@ app.post('/signin', (req, res) => {
               firstName: user.first_name,
               lastName: user.last_name,
               username: user.username,
-              id: user.id
+              id: user.id,
+              profilePicture: user.profile_picture || '/images/Placeholder_Profile_Image.jpg'
             }, { httpOnly: true });
             res.json({ message: 'Sign in successful.', redirect: '/' });
           } else {

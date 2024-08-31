@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "node app/server.js",
-    "setup": "fly postgres connect -a currentvideos < setup.sql",
+    "setup": "fly postgres connect -a currentvideos-db < setup.sql",
     "start:dev": "env-cmd node app/server.js",
     "setup:dev": "env-cmd psql -d postgres -f setup.sql"
   },
