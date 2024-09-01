@@ -10,6 +10,41 @@ function formatDate(date) {
     return `${month} ${day}, ${year}`;
 }
 
+const commentInput = document.getElementById('comment-input');
+const commentButton = document.getElementById('comment-button');
+const cancelButton = document.getElementById('cancel-button');
+
+commentInput.addEventListener('input', () => {
+    if (commentInput.value.trim() !== "") {
+        commentButton.disabled = false;
+        commentButton.classList.add('active');
+    } else {
+        commentButton.disabled = true;
+        commentButton.classList.remove('active');
+    }
+});
+
+cancelButton.addEventListener('click', () => {
+    commentInput.value = '';
+    commentButton.disabled = true;
+    commentButton.classList.remove('active');
+});
+
+commentButton.addEventListener('click', () =>{
+  fetch('/comment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      comment: commentInput.value,
+      vid: videoId
+    })
+  }).then(async res => {
+    alert(await res.text());
+  });
+})
+
 document.getElementById("like").addEventListener("click", (event) => {
     fetch('/rate', {
         method: 'POST',
@@ -52,18 +87,50 @@ document.addEventListener('DOMContentLoaded', () => {
                   throw { status, msg };
               });
           }
-      }).then(content => {
+      }).then(info => {
           let video = document.createElement('video');
           video.setAttribute("id", "videoContent");
-          video.src = `stream?file=${content.file}`;
+          video.src = `stream?file=${info.file}`;
           video.controls = true;
           videoPlayer.appendChild(video);
 
-          document.getElementById("video-title").innerText = content.title;
+          document.getElementById("video-title").innerText = info.title;
           document.getElementById("description-box").style.display = "block";
           document.getElementById("insights").style.display = "block";
-          document.getElementById("upload-date").innerText = formatDate(content.uploadDate);
-          document.getElementById("description-text").innerText = content.description;
+          document.getElementById("upload-date").innerText = formatDate(info.uploadDate);
+          document.getElementById("description-text").innerText = info.description;
+          
+          info.comments.forEach(comment => {
+            fetch(`account_info?userId=${comment.userid}`)
+                .then(res => res.json())
+                .then(userInfo => {
+                    let commentElement = document.createElement('div');
+                    commentElement.setAttribute("id", `comment-${comment.userid}`);
+                    commentElement.setAttribute("class", "comment-element");
+                    let profileImage = document.createElement('img');
+                    if (userInfo.profile_picture) {
+                      profileImage.setAttribute("src", `${userInfo.profile_picture}`);
+                    }
+                    else{
+                        profileImage.setAttribute("src", `/images/Placeholder_Profile_Image.jpg`);
+                    }
+                    profileImage.setAttribute("alt", `${userInfo.username}'s profile picture`);
+                    profileImage.setAttribute("class", "comment-avatar");
+
+                    let commentBody = document.createElement("p");
+                    commentBody.textContent = `${userInfo.username}: ${comment.content}`;
+
+                    commentElement.appendChild(profileImage);
+                    commentElement.appendChild(commentBody);
+
+                    document.getElementById("comments").appendChild(commentElement);
+
+                  }
+                 )
+                .catch(error => {
+                    console.error('Error fetching user info:', error);
+                });
+        });
 
           fetch(`video_insights?vid=${videoId}`).then(response => response.json()).then(insights => {
               document.getElementById("views-count").innerText = insights.views;

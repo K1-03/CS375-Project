@@ -196,11 +196,66 @@ app.post('/rate', async (req, res) => {
   }
 });
 
-
+app.post('/comment', (req, res) => {
+  if (req.cookies.userInfo){
+    if (req.body.parentId){
+      //Code for replies to existing comments.
+    }
+    else{
+      pool.query("INSERT INTO comments (vid, userId, timeCommented, content) VALUES ($1, $2, $3, $4)",
+         [req.body.vid, req.cookies.userInfo.id, (new Date()).toISOString().slice(0, 19).replace('T', ' '), req.body.comment]);
+      res.send("Comment posted successfully");
+    }
+  }
+  else{
+    res.status(401);
+    res.send("Must be signed in to comment");
+  }
+});
 
 app.get('/newest_first', async (req, res) => {
   try{
-    let result = await pool.query("SELECT * FROM video_information");
+    let result = await pool.query("SELECT * FROM video_information ORDER BY uploadtime DESC;");
+
+    let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
+      return element.includes(req.query.vid);
+    });
+
+    res.status(200);
+    res.json({
+      rows: result.rows,
+      length: result.rowCount
+    });
+  }
+  catch(error){
+    res.status(500);
+    res.send(error);
+  }
+});
+
+app.get('/most_popular', async (req, res) => {
+  try{
+    let result = await pool.query("SELECT * FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid ORDER BY vs.likes DESC;");
+
+    let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
+      return element.includes(req.query.vid);
+    });
+
+    res.status(200);
+    res.json({
+      rows: result.rows,
+      length: result.rowCount
+    });
+  }
+  catch(error){
+    res.status(500);
+    res.send(error);
+  }
+});
+
+app.get('/most_liked', async (req, res) => {
+  try{
+    let result = await pool.query("SELECT * FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid ORDER BY vs.likes DESC;");
 
     let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
       return element.includes(req.query.vid);
@@ -221,6 +276,7 @@ app.get('/newest_first', async (req, res) => {
 app.get('/video_info', async (req, res) =>{
   try{
     let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [req.query.vid]);
+    let commentResult = await pool.query("SELECT * FROM comments WHERE vid=$1", [req.query.vid]);
 
     if (result.rows.length === 1){
        let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
@@ -235,7 +291,9 @@ app.get('/video_info', async (req, res) =>{
         account: result.rows[0].userid,
         tags:   result.rows[0].tags,
         file: videoFileName,
-        uploadDate: result.rows[0].uploaddate
+        uploadDate: result.rows[0].uploaddate,
+        uploadTime: result.rows[0].uploadtime,
+        comments: commentResult.rows
     });
     }
     else{
@@ -247,6 +305,15 @@ app.get('/video_info', async (req, res) =>{
     res.status(500);
     res.send(error);
   }
+});
+
+app.get('/account_info', async (req, res) => {
+  let result = await pool.query("SELECT username, profile_picture FROM users WHERE id = $1", [req.query.userId]);
+
+  res.json({
+    username: result.rows[0].username,
+    profile_picture: result.rows[0].profile_picture
+ });
 });
 
 app.get('/video_insights', async (req, res) => {
@@ -298,6 +365,7 @@ app.post("/upload",  upload.fields([
     let title = req.query.title;
     let description = req.query.description;
     let uploadDate = new Date();
+    let uploadTime = uploadDate.toISOString().slice(0, 19).replace('T', ' ');
 
 
     let tags = [...description.matchAll(/#([^\s#]+)/g)];
@@ -321,9 +389,9 @@ app.post("/upload",  upload.fields([
         result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [videoId]);
       }
 
-      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, userId, tags, uploadDate)"
-        + "VALUES ($1, $2, $3, $4, $5, $6, $7)",
-        [videoId, thumbnailId, title, description, userId, tagStr, uploadDate]);
+      pool.query("INSERT INTO video_information (vid, thumbnail, title, description, userId, tags, uploadDate, uploadTime)"
+        + "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        [videoId, thumbnailId, title, description, userId, tagStr, uploadDate, uploadTime]);
 
       pool.query("INSERT INTO video_insights (vid, views, likes, dislikes, numberOfComments)"
         + "VALUES ($1, $2, $3, $4, $5)",

@@ -36,6 +36,21 @@
             <p id="upload-date"> </p>
             <p id="description-text"> </p>
         </div>
+        
+        <div id="comment-section">
+            <div class="comment-box">
+                <img src="/images/Placeholder_Profile_Image.jpg" alt="User Avatar" class="comment-avatar" id="avatar-preview">
+                <input type="text" id="comment-input" placeholder="Add a comment...">
+            </div>
+            <div id="comment-buttons">
+                <button id="cancel-button">Cancel</button>
+                <button id="comment-button" disabled>Comment</button>
+            </div>
+            <div id="comments">
+
+            </div>
+        </div>
+
     </main>
     <script src="/javascript/video.js"></script>
     <script>
@@ -46,6 +61,7 @@
                 let data = await response.json();
                 if (data.signedIn) {
                     document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+                    document.getElementById('avatar-preview').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
                     document.getElementById('username').textContent = data.userInfo.username || 'Guest';
                 }
             } catch (error) {
