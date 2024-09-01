@@ -235,7 +235,7 @@ app.get('/newest_first', async (req, res) => {
 
 app.get('/most_popular', async (req, res) => {
   try{
-    let result = await pool.query("SELECT * FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid ORDER BY vs.likes DESC;");
+    let result = await pool.query("SELECT * FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid ORDER BY vs.views DESC;");
 
     let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
       return element.includes(req.query.vid);
