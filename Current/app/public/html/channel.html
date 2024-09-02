@@ -8,27 +8,29 @@
 </head>
 <body>
     <div class="channel-container">
-        <div class="channel-sidebar">
-            <ul>
-                <li><a href="/upload">Upload</a></li>
-                <li><a href="/profile">Profile</a></li>
-                <li><a href="/settings">Settings</a></li>
-            </ul>
-        </div>
         <div class="channel-content">
             <div class="channel-header">
-                <h1 id="user-name"></h1>
-                <p id="user-username"></p>
+                <img id="profile-picture" src="" alt="Profile Picture">
+                <div class="user-info">
+                    <h1 id="user-name"></h1>
+                    <p id="user-username"></p>
+                </div>
+                <div class="upload-button-wrapper">
+                    <a href="/upload" id="upload-button">Upload</a>
+                </div>
             </div>
             <div class="channel-tabs">
                 <ul>
-                    <li><a href="#" id="home-tab">Home</a></li>
-                    <li><a href="#">Videos</a></li>
+                    <li class="active-tab"><a href="javascript:void(0);" onclick="showTab('home-tab', this.parentElement); loadUserVideos(userId, '/most_viewed');">Home</a></li>
+                    <li><a href="javascript:void(0);" onclick="showTab('videos-tab', this.parentElement); loadUserVideos(userId, '/user_videos');">Videos</a></li>
                 </ul>
             </div>
-            <div class="tab-content" id="tab-content">
+            <div id="home-tab" class="tab-content">
+                <div id="home-videos-container"></div>
             </div>
-            <div id="videos-container"></div>
+            <div id="videos-tab" class="tab-content" style="display: none;">
+                <div id="videos-videos-container"></div>
+            </div>
         </div>
     </div>
     <script src="/javascript/channel.js"></script>

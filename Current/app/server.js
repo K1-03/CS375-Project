@@ -291,24 +291,40 @@ app.get ('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'signup.html'));
 });
 
-app.get('/user_videos', (req, res) => {
-  const userId = req.cookies.userInfo.id;
-  console.log('Received userId:', userId);
-  if (!userId) {
-    return res.status(400).json({ message: 'User ID is required' });
-  }
-  const query = 'SELECT * FROM video_information WHERE userid = $1 ORDER BY uploaddate DESC';
+app.get('/user_videos', async (req, res) => {
+  try {
+    const userId = req.cookies.userInfo.id;
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    const query = 'SELECT * FROM video_information WHERE userid = $1 ORDER BY uploaddate DESC';
+    const result = await pool.query(query, [userId]);
 
-  pool.query(query, [userId], (err, result) => {
-      if (err) {
-        console.error('Error executing query', err.stack);
-        return res.status(500).json({ error: 'Internal server error' });
-      }
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-      res.json(result);
-    });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No videos found' });
+    }
+    res.json(result);
+    } catch (err) {
+      console.error('Error executing query', err.stack);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/most_viewed', async (req, res) => {
+  try {
+    const userId = req.cookies.userInfo.id;
+    const query = `SELECT vi.*, vs.views FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid WHERE vi.userid = $1 ORDER BY vs.views DESC`;
+
+    const result = await pool.query(query, [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No videos found' });
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // MAKE SURE THIS IS THE LAST GET REQUEST AS
