@@ -398,7 +398,7 @@ app.get('/:username', (req, res) => {
   const username = req.params.username.toLowerCase();
   const userInfo = req.cookies.userInfo;
 
-  console.log(userInfo);
+  //console.log(userInfo);
 
   if (userInfo && userInfo.username.toLowerCase() === username) {
     res.sendFile(path.join(__dirname, 'public', 'html', 'channel.html'));
