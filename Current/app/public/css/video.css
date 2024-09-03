@@ -94,6 +94,9 @@ html, body {
     border: 1px solid #333;
     border-radius: 5px;
     width: 95%;
+    max-width: 95%; 
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
 }
 
 .comment-box {
@@ -154,6 +157,10 @@ html, body {
     cursor: pointer;
 }
 
-.comment-element{
+.comment-element {
     padding-top: 1%;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%; 
 }

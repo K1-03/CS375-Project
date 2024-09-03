@@ -276,7 +276,7 @@ app.get('/most_liked', async (req, res) => {
 app.get('/video_info', async (req, res) =>{
   try{
     let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [req.query.vid]);
-    let commentResult = await pool.query("SELECT * FROM comments WHERE vid=$1", [req.query.vid]);
+    let commentResult = await pool.query("SELECT * FROM comments WHERE vid=$1 ORDER BY commentid DESC", [req.query.vid]);
 
     if (result.rows.length === 1){
        let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {

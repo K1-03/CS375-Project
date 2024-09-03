@@ -1,4 +1,5 @@
 let videoId;
+let tempCommentId = "temp";
 
 function formatDate(date) {
     let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -30,7 +31,7 @@ cancelButton.addEventListener('click', () => {
     commentButton.classList.remove('active');
 });
 
-commentButton.addEventListener('click', () =>{
+commentButton.addEventListener('click', async () =>{
   fetch('/comment', {
     method: 'POST',
     headers: {
@@ -43,7 +44,43 @@ commentButton.addEventListener('click', () =>{
   }).then(async res => {
     alert(await res.text());
   });
-})
+
+  let response = await fetch('/user_info');
+  let data = await response.json();
+  
+  tempCommentId += "*";
+
+  let commentElement = document.createElement('div');
+  commentElement.setAttribute("id", `comment-${tempCommentId}`);
+  commentElement.setAttribute("class", "comment-element");
+  let profileImage = document.createElement('img');
+  if (data.userInfo.profilePicture) {
+      profileImage.setAttribute("src", `${data.userInfo.profilePicture}`);
+  }
+  else{
+      profileImage.setAttribute("src", `/images/Placeholder_Profile_Image.jpg`);
+  }
+  profileImage.setAttribute("alt", `${data.userInfo.username}'s profile picture`);
+  profileImage.setAttribute("class", "comment-avatar");
+
+  let userName = document.createElement("p");
+  let commentBody = document.createElement("p");
+  
+  userName.textContent = `@${data.userInfo.username}`;
+  commentBody.textContent = commentInput.value;
+
+  userName.setAttribute("style", "font-weight: bold; display: inline;");
+
+  commentElement.appendChild(profileImage);
+  commentElement.appendChild(userName);
+  commentElement.appendChild(commentBody);
+
+  document.getElementById("comments").appendChild(commentElement);
+
+  commentInput.value = "";
+  commentButton.disabled = true;
+  commentButton.classList.remove('active');
+});
 
 document.getElementById("like").addEventListener("click", (event) => {
     fetch('/rate', {
@@ -105,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(res => res.json())
                 .then(userInfo => {
                     let commentElement = document.createElement('div');
-                    commentElement.setAttribute("id", `comment-${comment.userid}`);
+                    commentElement.setAttribute("id", `comment-${comment.commentid}`);
                     commentElement.setAttribute("class", "comment-element");
                     let profileImage = document.createElement('img');
                     if (userInfo.profile_picture) {
@@ -117,10 +154,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     profileImage.setAttribute("alt", `${userInfo.username}'s profile picture`);
                     profileImage.setAttribute("class", "comment-avatar");
 
+                    let userName = document.createElement("p");
                     let commentBody = document.createElement("p");
-                    commentBody.textContent = `${userInfo.username}: ${comment.content}`;
+  
+                    userName.textContent = `@${userInfo.username}`;
+                    commentBody.textContent = `${comment.content}`;
+
+                    userName.setAttribute("style", "font-weight: bold; display: inline;");
 
                     commentElement.appendChild(profileImage);
+                    commentElement.appendChild(userName);
                     commentElement.appendChild(commentBody);
 
                     document.getElementById("comments").appendChild(commentElement);
