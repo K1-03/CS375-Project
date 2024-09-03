@@ -24,6 +24,14 @@
             </div>
         </div>
     </header>
+    <div id="sort">
+        <button class="menu">Sort By</button>
+        <div class="sort-options">
+            <button id="newest-first">Newest First</button>
+            <button id="most-popular">Most Popular</button>
+            <button id="most-liked">Most Liked</button>
+        </div>
+    </div>
     <main class="main">
         <div class="thumbnails" id="thumbnails-container">
         </div>
@@ -47,6 +55,19 @@
                     }
                 })
                 .catch(error => console.error('Error fetching user info:', error));
+
+            const sortButton = document.querySelector('#sort .menu');
+            const sortOptions = document.querySelector('#sort .sort-options');
+
+            sortButton.addEventListener('click', function() {
+                sortOptions.style.display = sortOptions.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!sortButton.contains(event.target) && !sortOptions.contains(event.target)) {
+                    sortOptions.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>

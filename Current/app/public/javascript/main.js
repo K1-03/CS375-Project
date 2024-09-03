@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
             throw Error("Something Went Wrong");
         }
     }).then(data => {
-        for (let i = data.length - 1; i >= 0; --i) {
-            thumbnails[data.length - i] = {
+        for (let i = 0; i < data.length; ++i) {
+            thumbnails[i] = {
                 id: data.rows[i].thumbnail,
                 src: `/images/thumbnails/${data.rows[i].thumbnail}`,
                 link: `/video?vid=${data.rows[i].vid}`,
@@ -98,4 +98,82 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         displayThumbnails(filteredThumbnails);
     });
+
+    
+let newestFirstButton = document.getElementById("newest-first");
+let mostPopularButton = document.getElementById("most-popular");
+let mostLikedButton = document.getElementById("most-liked");
+
+newestFirstButton.addEventListener("click", event => {
+    let thumbnails = [];
+
+    fetch("/newest_first").then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw Error("Something Went Wrong");
+        }
+    }).then(data => {
+        for (let i = 0; i < data.length; ++i) {
+            thumbnails[i] = {
+                id: data.rows[i].thumbnail,
+                src: `/images/thumbnails/${data.rows[i].thumbnail}`,
+                link: `/video?vid=${data.rows[i].vid}`,
+                title: `${data.rows[i].title}`
+            };
+        }
+        displayThumbnails(thumbnails);
+    }).catch(err => {
+        console.log(err);
+    });
+})
+
+
+mostPopularButton.addEventListener("click", event => {
+    let thumbnails = [];
+
+    fetch("/most_popular").then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw Error("Something Went Wrong");
+        }
+    }).then(data => {
+        for (let i = 0; i < data.length; ++i) {
+            thumbnails[i] = {
+                id: data.rows[i].thumbnail,
+                src: `/images/thumbnails/${data.rows[i].thumbnail}`,
+                link: `/video?vid=${data.rows[i].vid}`,
+                title: `${data.rows[i].title}`
+            };
+        }
+        displayThumbnails(thumbnails);
+    }).catch(err => {
+        console.log(err);
+    });
+})
+
+mostLikedButton.addEventListener("click", event => {
+    let thumbnails = [];
+
+    fetch("/most_liked").then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw Error("Something Went Wrong");
+        }
+    }).then(data => {
+        for (let i = 0; i < data.length; ++i) {
+            thumbnails[i] = {
+                id: data.rows[i].thumbnail,
+                src: `/images/thumbnails/${data.rows[i].thumbnail}`,
+                link: `/video?vid=${data.rows[i].vid}`,
+                title: `${data.rows[i].title}`
+            };
+        }
+        displayThumbnails(thumbnails);
+    }).catch(err => {
+        console.log(err);
+    });
+})
 });
