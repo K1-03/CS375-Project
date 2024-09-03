@@ -19,7 +19,8 @@ CREATE TABLE video_information (
     description VARCHAR(512) NOT NULL,
     userId INTEGER NOT NULL,
     tags VARCHAR(9999) NOT NULL,
-    uploadDate DATE NOT NULL
+    uploadDate DATE NOT NULL,
+    uploadTime TIMESTAMP NOT NULL
 );
 
 CREATE TABLE video_insights(
@@ -36,7 +37,7 @@ CREATE TABLE comments(
     userId INTEGER NOT NULL,
     parentCommentId INTEGER, /*commentId of potential parent comment is replying to*/
     content VARCHAR(512) NOT NULL,
-    timeCommented DATE NOT NULL
+    timeCommented TIMESTAMP NOT NULL
 );
 
 CREATE TABLE ratings(
