@@ -1,41 +1,53 @@
 let userId = null;
 document.addEventListener('DOMContentLoaded', () => {
     const homeTabLink = document.querySelector('.channel-tabs ul li:first-child');
-    
     showTab('home-tab', homeTabLink);
 
-    fetch('/user_info')
-        .then(response => response.json())
-        .then(data => {
-            const userNameElement = document.getElementById('user-name');
-            const userUsernameElement = document.getElementById('user-username');
-            const profilePictureElement = document.getElementById('profile-picture');
+    const username = window.location.pathname.split('/')[1];
+    console.log('Current Username:', username);
 
-            if (data.signedIn) {  
-                const userInfo = data.userInfo;
-                if (userInfo.firstName && userInfo.lastName) {
-                    userNameElement.textContent = `${userInfo.firstName} ${userInfo.lastName}`;
-                }
-                if (userInfo.username) {
-                    userUsernameElement.textContent = `@${userInfo.username}`;
-                }
-                if (userInfo.profilePicture) {
-                    profilePictureElement.src = userInfo.profilePicture;
-                }
-                loadUserVideos(userInfo.id, '/most_viewed');
-            } else {
-                console.error('User not signed in or user info missing.');
+
+fetch(`/api/username/${username}`)
+    .then(response => response.json())
+    .then(data => {
+        console.log('Fetched Data:', data);
+        const userNameElement = document.getElementById('user-name');
+        const userUsernameElement = document.getElementById('user-username');
+        const profilePictureElement = document.getElementById('profile-picture');
+        const uploadButtonWrapper = document.querySelector('.upload-button-wrapper');
+        // Display user information
+        if (data.user) {
+            const user = data.user;
+            userId = user.id;
+            if (user.first_name && user.last_name) {
+                userNameElement.textContent = `${user.first_name} ${user.last_name}`;
             }
-        })
-        .catch(error => {
-            console.error('Error fetching user information:', error);
-        });
+            if (user.username) {
+                userUsernameElement.textContent = `@${user.username}`;
+            }
+            if (user.profile_picture) {
+                profilePictureElement.src = user.profile_picture;
+            }
+
+            if (data.isOwner) {
+                uploadButtonWrapper.style.display = 'block';
+            }
+            
+            loadUserVideos(userId, '/most_viewed');
+        } else {
+            console.error('User data missing.');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching user information:', error);
+    });
 });
 
 function showTab(tabId, tabLink) {
+    console.log('Showing tab:', tabId);
     const tabs = document.querySelectorAll('.tab-content');
     const tabLinks = document.querySelectorAll('.channel-tabs ul li');
-    
+    console.log(tabs);
     tabs.forEach(tab => {
         tab.style.display = 'none';
     });
@@ -75,6 +87,8 @@ function loadUserVideos(userId, endpoint) {
             while (videosContainer.firstChild) {
                 videosContainer.removeChild(videosContainer.firstChild);
             }
+
+            console.log(data);
 
             data.rows.forEach(video => {
                 const videoItem = document.createElement('div');
