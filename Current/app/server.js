@@ -348,6 +348,65 @@ app.get('/upload', (req, res) => {
   }
 });
 
+app.get('/signin', (req, res) => {
+  res.sendFile(path.join(__dirname,'public', 'html', 'signin.html'));
+});
+
+app.get ('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'html', 'signup.html'));
+});
+
+app.get('/user_videos', async (req, res) => {
+  try {
+    const userId = req.cookies.userInfo.id;
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    const query = 'SELECT * FROM video_information WHERE userid = $1 ORDER BY uploaddate DESC';
+    const result = await pool.query(query, [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No videos found' });
+    }
+    res.json(result);
+    } catch (err) {
+      console.error('Error executing query', err.stack);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/most_viewed', async (req, res) => {
+  try {
+    const userId = req.cookies.userInfo.id;
+    const query = `SELECT vi.*, vs.views FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid WHERE vi.userid = $1 ORDER BY vs.views DESC`;
+
+    const result = await pool.query(query, [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No videos found' });
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// MAKE SURE THIS IS THE LAST GET REQUEST AS
+// IT WILL INTERFERE WITH OTHER GET REQUESTS OTHERWISE
+app.get('/:username', (req, res) => {
+  const username = req.params.username.toLowerCase();
+  const userInfo = req.cookies.userInfo;
+
+  console.log(userInfo);
+
+  if (userInfo && userInfo.username.toLowerCase() === username) {
+    res.sendFile(path.join(__dirname, 'public', 'html', 'channel.html'));
+  } else {
+    res.status(404).send('User not found');
+  }
+});
+
 app.post("/upload",  upload.fields([
   { name: 'video', maxCount: 1 },
   { name: 'thumbnail', maxCount: 1 }
@@ -425,13 +484,6 @@ app.post("/upload",  upload.fields([
  }
 });
 
-app.get('/signin', (req, res) => {
-  res.sendFile(path.join(__dirname,'public', 'html', 'signin.html'));
-});
-
-app.get ('/signup', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'html', 'signup.html'));
-});
 
 app.post('/signin', (req, res) => {
   const { emailOrUsername, password } = req.body;
