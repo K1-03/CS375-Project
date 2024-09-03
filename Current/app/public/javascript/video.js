@@ -92,6 +92,10 @@ document.getElementById("like").addEventListener("click", (event) => {
           rating: "like",
           vid: videoId
         })
+      }).then(async response => {
+        if (response.status === 401){
+          alert(await response.text());
+        }
       });
 });
 
@@ -105,6 +109,10 @@ document.getElementById("dislike").addEventListener("click", (event) => {
           rating: "dislike",
           vid: videoId
         })
+      }).then(async response => {
+        if (response.status === 401){
+          alert(await response.text());
+        }
       });
 });
 

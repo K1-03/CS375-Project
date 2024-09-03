@@ -190,9 +190,7 @@ app.post('/rate', async (req, res) => {
   }
   }
   else{
-    console.log(req.cookies);
-    console.log("Must be signed in to rate.\n");//There should be some actual user feedback letting the user know they
-    //need to sign-in to rate a video.
+    res.status(401).send("Must be signed in to rate.")
   }
 });
 
