@@ -66,8 +66,18 @@ app.get('/', (req, res) => {
 
 app.get('/user_info', (req, res) => {
   const userInfo = req.cookies.userInfo;
+  const usernameQuery = req.query.username;
+  console.log('User Info from Cookies:', userInfo);
+  console.log('Query Username:', usernameQuery);
+
   if (userInfo) {
-    res.json({ signedIn: true, userInfo: userInfo });
+    const isOwner = req.query.username && req.query.username.toLowerCase() === userInfo.username.toLowerCase();
+    console.log('Is Owner:', isOwner);
+    res.json({ 
+      signedIn: true, 
+      userInfo: userInfo,
+      showUploadButton: isOwner
+    });
   } else {
     res.json({ signedIn: false });
   }
@@ -358,7 +368,8 @@ app.get ('/signup', (req, res) => {
 
 app.get('/user_videos', async (req, res) => {
   try {
-    const userId = req.cookies.userInfo.id;
+    const userId = req.query.userid;
+    console.log("user videos user id:", userId);
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
     }
@@ -368,7 +379,7 @@ app.get('/user_videos', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'No videos found' });
     }
-    res.json(result);
+    res.json({ rows: result.rows });
     } catch (err) {
       console.error('Error executing query', err.stack);
       res.status(500).json({ error: 'Internal server error' });
@@ -377,7 +388,7 @@ app.get('/user_videos', async (req, res) => {
 
 app.get('/most_viewed', async (req, res) => {
   try {
-    const userId = req.cookies.userInfo.id;
+    const userId = req.query.userid;
     const query = `SELECT vi.*, vs.views FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid WHERE vi.userid = $1 ORDER BY vs.views DESC`;
 
     const result = await pool.query(query, [userId]);
@@ -394,17 +405,44 @@ app.get('/most_viewed', async (req, res) => {
 
 // MAKE SURE THIS IS THE LAST GET REQUEST AS
 // IT WILL INTERFERE WITH OTHER GET REQUESTS OTHERWISE
-app.get('/:username', (req, res) => {
+app.get('/api/username/:username', async (req, res) => {
   const username = req.params.username.toLowerCase();
   const userInfo = req.cookies.userInfo;
+  console.log('Request Username:', username);
+  console.log('User Info from Cookies:', userInfo);
 
   //console.log(userInfo);
 
-  if (userInfo && userInfo.username.toLowerCase() === username) {
-    res.sendFile(path.join(__dirname, 'public', 'html', 'channel.html'));
-  } else {
-    res.status(404).send('User not found');
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username]);
+    console.log('Database Query Result:', result.rows);
+
+    if (result.rows.length > 0) {
+      const user = result.rows[0];
+      const isOwner = userInfo && userInfo.username.toLowerCase() === username;
+      console.log('Is Owner:', isOwner);
+
+      res.json({
+        user: {
+          id: user.id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          username: user.username,
+          profile_picture: user.profile_picture || '/images/Placeholder_Profile_Image.jpg'
+        },
+        isOwner: isOwner
+      });
+    } else {
+      res.status(404).send('User not found');
+    }
+  } catch (err) {
+    console.error('Error checking username:', err);
+    res.status(500).send('Server error');
   }
+});
+
+app.get('/:username', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'html', 'channel.html'));
 });
 
 app.post("/upload",  upload.fields([

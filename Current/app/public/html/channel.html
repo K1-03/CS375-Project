@@ -15,14 +15,14 @@
                     <h1 id="user-name"></h1>
                     <p id="user-username"></p>
                 </div>
-                <div class="upload-button-wrapper">
-                    <a href="/upload" id="upload-button">Upload</a>
+                <div class="upload-button-wrapper" style="display: none;">
+                    <a id="upload-button" href="/upload">Upload</a>
                 </div>
             </div>
             <div class="channel-tabs">
                 <ul>
-                    <li class="active-tab"><a href="javascript:void(0);" onclick="showTab('home-tab', this.parentElement); loadUserVideos(userId, '/most_viewed');">Home</a></li>
-                    <li><a href="javascript:void(0);" onclick="showTab('videos-tab', this.parentElement); loadUserVideos(userId, '/user_videos');">Videos</a></li>
+                    <li class="active-tab"><a href="javascript:void(0);" onclick="showTab('home-tab', this.parentElement);">Home</a></li>
+                    <li><a href="javascript:void(0);" onclick="console.log('Videos tab clicked'); showTab('videos-tab', this.parentElement); loadUserVideos(userId, '/user_videos');">Videos</a></li>
                 </ul>
             </div>
             <div id="home-tab" class="tab-content">
