@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById("video-title").innerText = info.title;
           document.getElementById("description-box").style.display = "block";
           document.getElementById("insights").style.display = "block";
+          document.getElementById("comment-section").style.display = "flex";
           document.getElementById("upload-date").innerText = formatDate(info.uploadDate);
           document.getElementById("description-text").innerText = info.description;
           

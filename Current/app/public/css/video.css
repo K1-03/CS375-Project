@@ -33,6 +33,7 @@ html, body {
 #insights {
     margin-left: 10px;
     margin-top: 10px;
+    display: none;
 }
 
 #insights-data {
@@ -86,7 +87,7 @@ html, body {
 
 
 #comment-section {
-    display: flex;
+    display: none;
     flex-direction: column;
     margin: 20px 20px;
     padding: 10px;

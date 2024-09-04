@@ -37,7 +37,11 @@ const storage = multer.diskStorage({
       cb(null, path.join(__dirname, 'public', 'images', 'thumbnails'));
     } else if (file.fieldname === 'profilepicture') {
       cb(null, path.join(__dirname, 'public', 'images', 'profilepictures'));
-    } else {
+    } 
+    else if (file.fieldname === 'postImage') {
+      cb(null, path.join(__dirname, 'public', 'images', 'post_images'));
+    }
+    else {
       cb(new Error('Invalid field name'), false);
     }
   },
@@ -146,6 +150,10 @@ app.get('/video', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'video.html'));
 });
 
+app.get('/view-post', (req, res) =>{
+  res.sendFile(path.join(__dirname, 'public', 'html', 'view-post.html'));
+})
+
 app.get('/stream', (req, res) => {
   let id = req.query.file.split(".")[0];
   pool.query("UPDATE video_insights SET views = views + 1 WHERE vid=($1)", [id]);
@@ -210,9 +218,16 @@ app.post('/comment', (req, res) => {
       //Code for replies to existing comments.
     }
     else{
-      pool.query("INSERT INTO comments (vid, userId, timeCommented, content) VALUES ($1, $2, $3, $4)",
-         [req.body.vid, req.cookies.userInfo.id, (new Date()).toISOString().slice(0, 19).replace('T', ' '), req.body.comment]);
-      res.send("Comment posted successfully");
+      if (req.body.vid){
+        pool.query("INSERT INTO comments (vid, userId, timeCommented, content) VALUES ($1, $2, $3, $4)",
+          [req.body.vid, req.cookies.userInfo.id, (new Date()).toISOString().slice(0, 19).replace('T', ' '), req.body.comment]);
+        res.send("Comment posted successfully");
+      }
+      else if (req.body.postId){
+        pool.query("INSERT INTO comments (postId, userId, timeCommented, content) VALUES ($1, $2, $3, $4)",
+          [req.body.postId, req.cookies.userInfo.id, (new Date()).toISOString().slice(0, 19).replace('T', ' '), req.body.comment]);
+        res.send("Comment posted successfully");
+      }
     }
   }
   else{
@@ -315,6 +330,34 @@ app.get('/video_info', async (req, res) =>{
   }
 });
 
+app.get('/post_info', async (req, res) =>{
+  try{
+    let result = await pool.query("SELECT * FROM forum_post_information WHERE postid=$1", [req.query.postId]);
+    let commentResult = await pool.query("SELECT * FROM comments WHERE postid=$1 ORDER BY commentid DESC", [req.query.postId]);
+
+    if (result.rows.length === 1){
+       res.status(200);
+       res.json({
+        subject: result.rows[0].title,
+        textcontent: result.rows[0].textcontent,
+        account: result.rows[0].userid,
+        timeposted: result.rows[0].timeposted,
+        dateposted: result.rows[0].dateposted,
+        comments: commentResult.rows,
+        postimage: result.rows[0].postimage
+    });
+    }
+    else{
+      res.status(404);
+      res.send(" Post Not Found :( ");
+    }
+  }
+  catch(error){
+    res.status(500);
+    res.send(error);
+  }
+});
+
 app.get('/account_info', async (req, res) => {
   let result = await pool.query("SELECT username, profile_picture FROM users WHERE id = $1", [req.query.userId]);
 
@@ -358,6 +401,15 @@ app.get('/upload', (req, res) => {
   }
 });
 
+app.get('/post', (req, res) => {
+  if (req.cookies.userInfo){
+    res.sendFile(path.join(__dirname, 'public', 'html', 'post.html'));
+  }
+  else{
+    res.sendFile(path.join(__dirname, 'public', 'html', 'signin.html'));
+  }
+});
+
 app.get('/signin', (req, res) => {
   res.sendFile(path.join(__dirname,'public', 'html', 'signin.html'));
 });
@@ -366,10 +418,29 @@ app.get ('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'signup.html'));
 });
 
+app.get('/user_posts', async (req, res) => {
+  try{
+    if(req.query.userid){
+      let result = await pool.query("SELECT * FROM forum_post_information WHERE userid= $1", [req.query.userid]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'No posts found' });
+      }
+      res.json({posts : result.rows});
+    }
+    else{
+      return res.status(401).json({ error: 'No user specified' });
+    }
+  }
+  catch (err) {
+    console.error('Error executing query', err.stack);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.get('/user_videos', async (req, res) => {
   try {
     const userId = req.query.userid;
-    console.log("user videos user id:", userId);
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
     }
@@ -443,6 +514,36 @@ app.get('/api/username/:username', async (req, res) => {
 
 app.get('/:username', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'channel.html'));
+});
+
+app.post("/post",  upload.fields([
+  { name: 'postImage', maxCount: 1 }
+]),async(req, res) =>{
+  let postImageFile = req.files.postImage ? req.files.postImage[0] : null;
+  let imageFilename;
+
+  let userId = req.cookies.userInfo.id;
+
+  let subject = req.query.subject;
+  let comment = req.query.comment;
+
+  let datePosted = new Date();
+  let timePosted = datePosted.toISOString().slice(0, 19).replace('T', ' ');
+
+  if (postImageFile){
+    imageFilename = postImageFile.filename;
+  }
+
+  try{
+    pool.query("INSERT INTO forum_post_information (userId, textContent, title, timePosted, datePosted, postImage)"
+        + "VALUES ($1, $2, $3, $4, $5, $6)",
+        [userId, comment, subject, timePosted, datePosted, imageFilename]);
+        res.json({message: "Post Created Successfully", redirectUrl: '/view-post' })
+  }
+  catch(err){
+    res.status(500);
+    res.json({message: "Server Error"});
+  }
 });
 
 app.post("/upload",  upload.fields([
