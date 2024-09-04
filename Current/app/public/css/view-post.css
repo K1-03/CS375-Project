@@ -1,0 +1,126 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-right #username, .header-right #username-display {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.header-right .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#post {
+    width: 95vw;
+    display: none;
+    flex-direction: column;
+    margin: 20px 20px;
+    padding: 10px;
+    background-color: #121212;
+    border: 1px solid #333;
+    border-radius: 5px;
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+}
+
+#post #subject{
+    font-weight: bold;
+}
+
+#comment-section {
+    display: none;
+    flex-direction: column;
+    margin: 20px 20px;
+    padding: 10px;
+    background-color: #121212;
+    border: 1px solid #333;
+    border-radius: 5px;
+    width: 95vw;
+    max-width: 95vw; 
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+}
+
+.comment-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+#comment-input {
+    width: 100%;
+    padding: 10px;
+    background-color: #121212;
+    color: white;
+    border: 1px solid #333;
+    border-radius: 20px;
+    outline: none;
+}
+
+#comment-input::placeholder {
+    color: #888;
+}
+
+#comment-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+#cancel-button, #comment-button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+#cancel-button:hover, #comment-button:hover {
+    background-color: #333;
+}
+
+#comment-button {
+    background-color: #333;
+    color: #888;
+    cursor: not-allowed;
+}
+
+#comment-button.active {
+    background-color: #1a73e8;
+    color: white;
+    cursor: pointer;
+}
+
+.comment-element {
+    padding-top: 1%;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%; 
+}
+
+.username-channel-link {
+    font-weight: bold;
+    display: inline;
+    color: white;
+    text-decoration: none;
+}
