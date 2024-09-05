@@ -63,15 +63,19 @@ commentButton.addEventListener('click', async () =>{
   profileImage.setAttribute("alt", `${data.userInfo.username}'s profile picture`);
   profileImage.setAttribute("class", "comment-avatar");
 
-  let userName = document.createElement("p");
+  let userName = document.createElement("a");
   let commentBody = document.createElement("p");
+  let channelLink = document.createElement("a");
   
   userName.textContent = `@${data.userInfo.username}`;
   commentBody.textContent = commentInput.value;
 
-  userName.setAttribute("style", "font-weight: bold; display: inline;");
+  userName.setAttribute("class", "username-channel-link");
+  userName.setAttribute("href", `/${data.userInfo.username}`);
+  channelLink.setAttribute("href", `/${data.userInfo.username}`);
 
-  commentElement.appendChild(profileImage);
+  channelLink.appendChild(profileImage);
+  commentElement.appendChild(channelLink);
   commentElement.appendChild(userName);
   commentElement.appendChild(commentBody);
 
@@ -142,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById("video-title").innerText = info.title;
           document.getElementById("description-box").style.display = "block";
           document.getElementById("insights").style.display = "block";
+          document.getElementById("comment-section").style.display = "flex";
           document.getElementById("upload-date").innerText = formatDate(info.uploadDate);
           document.getElementById("description-text").innerText = info.description;
           
@@ -162,15 +167,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     profileImage.setAttribute("alt", `${userInfo.username}'s profile picture`);
                     profileImage.setAttribute("class", "comment-avatar");
 
-                    let userName = document.createElement("p");
+                    let userName = document.createElement("a");
                     let commentBody = document.createElement("p");
+                    let channelLink = document.createElement("a");
   
                     userName.textContent = `@${userInfo.username}`;
                     commentBody.textContent = `${comment.content}`;
 
-                    userName.setAttribute("style", "font-weight: bold; display: inline;");
+                    userName.setAttribute("class", "username-channel-link");
+                    userName.setAttribute("href", `/${userInfo.username}`);
+                    channelLink.setAttribute("href", `/${userInfo.username}`);
 
-                    commentElement.appendChild(profileImage);
+                    channelLink.appendChild(profileImage);
+                    commentElement.appendChild(channelLink);
                     commentElement.appendChild(userName);
                     commentElement.appendChild(commentBody);
 

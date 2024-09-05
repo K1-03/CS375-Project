@@ -15,8 +15,13 @@
                     <h1 id="user-name"></h1>
                     <p id="user-username"></p>
                 </div>
-                <div class="upload-button-wrapper" style="display: none;">
-                    <a id="upload-button" href="/upload">Upload</a>
+                <div class="button-container">
+                    <div class="button-wrapper" id="upload-button-wrapper" style="display: none;">
+                        <a class="create-button" id="upload-button" href="/upload">Upload</a>
+                    </div>
+                    <div class="button-wrapper" id="post-button-wrapper" style="display: none;">
+                        <a class="create-button" id="post-button" href="/post">Post</a>
+                    </div>
                 </div>
                 <button id="follow-button" style="display: none;">Follow</button>
             </div>
@@ -24,6 +29,7 @@
                 <ul>
                     <li class="active-tab"><a href="javascript:void(0);" onclick="showTab('home-tab', this.parentElement);">Home</a></li>
                     <li><a href="javascript:void(0);" onclick="console.log('Videos tab clicked'); showTab('videos-tab', this.parentElement); loadUserVideos(userId, '/user_videos');">Videos</a></li>
+                    <li><a href="javascript:void(0);" onclick="showTab('posts-tab', this.parentElement); loadUserPosts();">Posts</a></li>
                 </ul>
             </div>
             <div id="home-tab" class="tab-content">
@@ -31,6 +37,9 @@
             </div>
             <div id="videos-tab" class="tab-content" style="display: none;">
                 <div id="videos-videos-container"></div>
+            </div>
+            <div id="posts-tab" class="tab-content" style="display: none;">
+                <div id="posts-container"></div>
             </div>
         </div>
     </div>

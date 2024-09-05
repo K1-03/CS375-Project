@@ -4,69 +4,6 @@ html, body {
     overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-#video-player {
-    height: 500px;
-    width: 100vw;
-}
-
-#videoContent {
-    height: 500px;
-    width: 100%;
-}
-
-#video-title{
-    font-size: 24px;
-    margin-left: 10px;
-    font-weight: bold;
-}
-
-#description-box{
-    border-color: black;
-    border-width:2px;
-    border-style:solid;
-    background-color:  #282c34;
-    display: none;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-#insights {
-    margin-left: 10px;
-    margin-top: 10px;
-    display: none;
-}
-
-#insights-data {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-#insights span {
-    font-weight: bold;
-}
-
-#insights-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-#insights-buttons button {
-    padding: 5px 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-#description-text{
-    margin-left: 5px;
-}
-
-#upload-date{
-    margin-left: 5px;
-    font-weight: bold;
-}
-
 .header-right {
     display: flex;
     align-items: center;
@@ -84,7 +21,22 @@ html, body {
     cursor: pointer;
 }
 
+#post {
+    width: 95vw;
+    display: none;
+    flex-direction: column;
+    margin: 20px 20px;
+    padding: 10px;
+    background-color: #121212;
+    border: 1px solid #333;
+    border-radius: 5px;
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+}
 
+#post #subject{
+    font-weight: bold;
+}
 
 #comment-section {
     display: none;
@@ -94,8 +46,8 @@ html, body {
     background-color: #121212;
     border: 1px solid #333;
     border-radius: 5px;
-    width: 95%;
-    max-width: 95%; 
+    width: 95vw;
+    max-width: 95vw; 
     word-wrap: break-word; 
     overflow-wrap: break-word; 
 }
