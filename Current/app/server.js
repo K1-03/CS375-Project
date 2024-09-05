@@ -64,19 +64,37 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
-app.get('/user_info', (req, res) => {
+app.get('/user_info', async (req, res) => {
   const userInfo = req.cookies.userInfo;
   const usernameQuery = req.query.username;
-  console.log('User Info from Cookies:', userInfo);
-  console.log('Query Username:', usernameQuery);
+
 
   if (userInfo) {
     const isOwner = req.query.username && req.query.username.toLowerCase() === userInfo.username.toLowerCase();
-    console.log('Is Owner:', isOwner);
+    let following = false;
+
+    if (!isOwner) {
+      try {
+        const followedUserIdResult = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1)', [usernameQuery]);
+        if (followedUserIdResult.rows.length > 0) {
+          const followedUserId = followedUserIdResult.rows[0].id;
+          const followCheck = await pool.query(
+            'SELECT * FROM follows WHERE follower_id = $1 AND followee_id = $2',
+            [userInfo.id, followedUserId]
+          );
+          following = followCheck.rows.length > 0;
+        }
+      } catch (err) {
+        console.error('Error checking follow status:', err);
+        return res.status(500).json({ message: 'Server error' });
+      }
+    }
+
     res.json({ 
       signedIn: true, 
       userInfo: userInfo,
-      showUploadButton: isOwner
+      showUploadButton: isOwner,
+      following: !isOwner ? following : null
     });
   } else {
     res.json({ signedIn: false });
@@ -403,24 +421,56 @@ app.get('/most_viewed', async (req, res) => {
   }
 });
 
+app.get('/followed_channels', async (req, res) => {
+  const userInfo = req.cookies.userInfo;
+
+  if(!userInfo) {
+    return res.json({ message: "Sign in to view followed channels" });
+  }
+
+  try {
+    const followResult = await pool.query(
+      `SELECT users.id, users.username, users.profile_picture
+      FROM follows
+      JOIN users ON follows.followee_id = users.id
+      WHERE follows.follower_id = $1`, 
+      [userInfo.id]
+    );
+
+    const followedChannels = followResult.rows;
+
+    if (followedChannels.length > 0) {
+      res.json({ message: "", channels: followedChannels });
+    } else {
+      res.json({ message: "Start following channels to see what your favorite creators are up to!" });
+    }
+  } catch (err) {
+    console.error('Error retrieving followed channels:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // MAKE SURE THIS IS THE LAST GET REQUEST AS
 // IT WILL INTERFERE WITH OTHER GET REQUESTS OTHERWISE
 app.get('/api/username/:username', async (req, res) => {
   const username = req.params.username.toLowerCase();
   const userInfo = req.cookies.userInfo;
-  console.log('Request Username:', username);
-  console.log('User Info from Cookies:', userInfo);
-
-  //console.log(userInfo);
 
   try {
     const result = await pool.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username]);
-    console.log('Database Query Result:', result.rows);
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
       const isOwner = userInfo && userInfo.username.toLowerCase() === username;
-      console.log('Is Owner:', isOwner);
+      let following = false;
+
+      if (!isOwner && userInfo) {
+        const followCheck = await pool.query(
+          'SELECT * FROM follows WHERE follower_id = $1 AND followee_id = $2',
+          [userInfo.id, user.id]
+        );
+        following = followCheck.rows.length > 0;
+      }
 
       res.json({
         user: {
@@ -430,7 +480,8 @@ app.get('/api/username/:username', async (req, res) => {
           username: user.username,
           profile_picture: user.profile_picture || '/images/Placeholder_Profile_Image.jpg'
         },
-        isOwner: isOwner
+        isOwner: isOwner,
+        following: !isOwner ? following : null
       });
     } else {
       res.status(404).send('User not found');
@@ -608,6 +659,38 @@ app.post('/signup', (req, res) => {
       });
     });
   });
+});
+
+app.post('/follow', async (req, res) => {
+  if (!req.cookies.userInfo) {
+    return res.status(401).json({ message: 'Must be signed in to follow users.' });
+  }
+
+  const { followedUserId } = req.body;
+  const followerUserId = req.cookies.userInfo.id;
+
+  try {
+    const followCheck = await pool.query(
+      'SELECT * FROM follows WHERE follower_id = $1 AND followee_id = $2',
+      [followerUserId, followedUserId]
+    );
+
+    if (followCheck.rows.length > 0) {
+      await pool.query('DELETE FROM follows WHERE follower_id = $1 AND followee_id = $2',
+        [followerUserId, followedUserId]
+      );
+      res.json({ message: 'Unfollowed successfully' });
+    } else {
+      await pool.query(
+        'INSERT INTO follows (follower_id, followee_id) VALUES ($1, $2)',
+        [followerUserId, followedUserId]
+      );
+      res.json({ message: 'Followed successfully' });
+    }
+  } catch (err) {
+    console.error('Error handling follow request:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 app.listen(port, () => {

@@ -45,3 +45,9 @@ CREATE TABLE ratings(
     userId INTEGER NOT NULL,
     rating VARCHAR(7)
 );
+
+CREATE TABLE follows (
+    follower_id INT REFERENCES users(id),
+    followee_id INT REFERENCES users(id),
+    PRIMARY KEY (follower_id, followee_id)
+);

@@ -80,6 +80,24 @@ body {
     background-color: #5a6268;
 }
 
+#follow-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+}
+
+#follow-button:hover {
+    background-color: #5a6268;
+}
+
 .channel-tabs {
     background-color: #282c34;
     padding-left: 10px;

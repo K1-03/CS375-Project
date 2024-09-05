@@ -15,6 +15,8 @@ fetch(`/api/username/${username}`)
         const userUsernameElement = document.getElementById('user-username');
         const profilePictureElement = document.getElementById('profile-picture');
         const uploadButtonWrapper = document.querySelector('.upload-button-wrapper');
+        const followButton = document.getElementById('follow-button');
+
         // Display user information
         if (data.user) {
             const user = data.user;
@@ -31,6 +33,13 @@ fetch(`/api/username/${username}`)
 
             if (data.isOwner) {
                 uploadButtonWrapper.style.display = 'block';
+                followButton.style.display = 'none';
+            } else {
+                followButton.style.display = 'block';
+                followButton.textContent = data.following ? 'Unfollow' : 'Follow';
+                followButton.addEventListener('click', () => {
+                    handleFollowButton(userId, followButton);
+                });
             }
             
             loadUserVideos(userId, '/most_viewed');
@@ -42,6 +51,24 @@ fetch(`/api/username/${username}`)
         console.error('Error fetching user information:', error);
     });
 });
+
+function handleFollowButton(followedUserId, button) {
+    fetch('/follow', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ followedUserId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message);
+        button.textContent = button.textContent === 'Follow' ? 'Unfollow' : 'Follow';
+    })
+    .catch(error => {
+        console.error('Error handling follow/unfollow:', error);
+    });
+}
 
 function showTab(tabId, tabLink) {
     console.log('Showing tab:', tabId);

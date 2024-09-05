@@ -13,6 +13,14 @@
         </div>
         <div class="header-center">
             <input type="text" placeholder="Search" id="search-bar">
+            <div id="sort">
+                <button class="menu">Sort By</button>
+                <div class="sort-options">
+                    <button id="newest-first">Newest First</button>
+                    <button id="most-popular">Most Popular</button>
+                    <button id="most-liked">Most Liked</button>
+                </div>
+            </div>
         </div>
         <div class="header-right">
             <span id="username-display"></span>
@@ -24,51 +32,17 @@
             </div>
         </div>
     </header>
-    <div id="sort">
-        <button class="menu">Sort By</button>
-        <div class="sort-options">
-            <button id="newest-first">Newest First</button>
-            <button id="most-popular">Most Popular</button>
-            <button id="most-liked">Most Liked</button>
-        </div>
-    </div>
+
     <main class="main">
+        <aside id="sidebar">
+            <div id="followed-channels-header" class="followed-channels-header">
+                <h2>Followed Channels</h2>
+            </div>
+        </aside>
+
         <div class="thumbnails" id="thumbnails-container">
         </div>
     </main>
     <script src="/javascript/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('/user_info')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.signedIn) {
-                        document.getElementById('username-display').textContent = data.userInfo.username;
-                        document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
-
-                        // Update dropdown menu based on sign-in status
-                        document.getElementById('signin-link').style.display = 'none';
-                    } else {
-                        document.getElementById('username-display').textContent = '';
-                        document.getElementById('avatar').src = '/images/Placeholder_Profile_Image.jpg';
-                        document.getElementById('signin-link').style.display = 'block';
-                    }
-                })
-                .catch(error => console.error('Error fetching user info:', error));
-
-            const sortButton = document.querySelector('#sort .menu');
-            const sortOptions = document.querySelector('#sort .sort-options');
-
-            sortButton.addEventListener('click', function() {
-                sortOptions.style.display = sortOptions.style.display === 'block' ? 'none' : 'block';
-            });
-
-            document.addEventListener('click', function(event) {
-                if (!sortButton.contains(event.target) && !sortOptions.contains(event.target)) {
-                    sortOptions.style.display = 'none';
-                }
-            });
-        });
-    </script>
 </body>
 </html>
