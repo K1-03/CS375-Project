@@ -586,14 +586,16 @@ app.post("/post",  upload.fields([
   }
 
   try{
-    pool.query("INSERT INTO forum_post_information (userId, textContent, title, timePosted, datePosted, postImage)"
-        + "VALUES ($1, $2, $3, $4, $5, $6)",
-        [userId, comment, subject, timePosted, datePosted, imageFilename]);
-        res.json({message: "Post Created Successfully", redirectUrl: '/view-post' })
-  }
-  catch(err){
-    res.status(500);
-    res.json({message: "Server Error"});
+    const result = await pool.query(
+      `INSERT INTO forum_post_information (userId, textContent, title, timePosted, datePosted, postImage)
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING postId`,
+      [userId, comment, subject, timePosted, datePosted, imageFilename]);
+      const postId = result.rows[0].postid;
+      
+      res.json({message: "Post Created Successfully", redirectUrl: `/view-post?postId=${postId}` });
+  } catch(err){
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 

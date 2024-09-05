@@ -11,6 +11,33 @@ function formatDate(date) {
     return `${month} ${day}, ${year}`;
 }
 
+// Update user info
+async function updateUserInfo() {
+    try {
+        let response = await fetch('/user_info');
+        let data = await response.json();
+        if (data.signedIn) {
+            const avatar = document.getElementById('avatar');
+            const avatarPreview = document.getElementById('avatar-preview');
+            const username = document.getElementById('username');
+
+            if (avatar) {
+                avatar.src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+            }
+            if (avatarPreview) {
+                avatarPreview.src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+            }
+            if (username) {
+                username.textContent = data.userInfo.username || 'Guest';
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching user info:', error);
+    }
+}
+
+updateUserInfo();
+
 const commentInput = document.getElementById('comment-input');
 const commentButton = document.getElementById('comment-button');
 const cancelButton = document.getElementById('cancel-button');

@@ -1,0 +1,242 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212; 
+    color: #ffffff; 
+    display: flex;
+}
+
+.channel-container {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.channel-content {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.channel-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #282c34;
+    width: 100%;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+.channel-header img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    object-fit: cover;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.channel-header h1 {
+    margin: 0;
+    font-size: 36px;
+}
+
+.channel-header p {
+    margin: 0;
+    font-size: 20px;
+    color: #cccccc;
+}
+
+.button-wrapper {
+    margin-left: 0;
+}
+
+.create-button {
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    text-align: center;
+    display: block;
+    width: fit-content;
+}
+
+#upload-button:hover {
+    background-color: #5a6268;
+}
+
+#follow-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+}
+
+#follow-button:hover {
+    background-color: #5a6268;
+}
+
+.channel-tabs {
+    background-color: #282c34;
+    padding-left: 10px;
+    border-bottom: 2px solid #444;
+}
+.channel-tabs ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    background-color: #282c34;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.channel-tabs ul li {
+    margin: 0;
+    padding: 0;
+    flex-grow: 0;
+    position: relative;
+}
+
+.channel-tabs ul li a {
+    display: block;
+    padding: 15px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    color: white;
+}
+
+.channel-tabs ul li a:hover {
+    background-color: #575757;
+}
+
+.channel-tabs ul li.active-tab a {
+    border-bottom: 3px solid #ffffff;
+    padding-bottom: 12px;
+}
+
+.tab-content {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.video-item {
+    width: calc(33.333% - 20px);
+    background-color: #333;
+    padding: 10px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.video-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.video-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.video-item h3 {
+    color: #fff;
+    font-size: 18px;
+    margin: 10px 0 5px;
+}
+
+.video-item p {
+    color: #ccc;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    .video-item {
+        width: 100%;
+    }
+
+    .channel-header h1 {
+        font-size: 28px;
+    }
+
+    .channel-header p {
+        font-size: 16px;
+    }
+}
+
+#posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+}
+
+.post-box {
+    background-color: #2c2f33; 
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    cursor: pointer; 
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start; 
+    width: 100%;
+}
+
+.post-box:hover {
+    background-color: #3a3d42; 
+}
+
+.post-title {
+    color: #d18bff; 
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.post-content {
+    color: #cccccc;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-top: 5px;
+    white-space: pre-wrap; 
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+    max-width: 100%; 
+}
