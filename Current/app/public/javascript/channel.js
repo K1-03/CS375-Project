@@ -15,16 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
     showTab('home-tab', homeTabLink);
 
     const username = window.location.pathname.split('/')[1];
-    console.log('Current Username:', username);
 
 
 fetch(`/api/username/${username}`)
     .then(response => response.json())
     .then(data => {
-        console.log('Fetched Data:', data);
         const userNameElement = document.getElementById('user-name');
         const userUsernameElement = document.getElementById('user-username');
         const profilePictureElement = document.getElementById('profile-picture');
+        const followButton = document.getElementById('follow-button');
         const uploadButtonWrapper = document.getElementById('upload-button-wrapper');
         const postButtonWrapper = document.getElementById('post-button-wrapper');
         // Display user information
@@ -44,6 +43,15 @@ fetch(`/api/username/${username}`)
             if (data.isOwner) {
                 uploadButtonWrapper.style.display = 'block';
                 postButtonWrapper.style.display = 'block';
+                followButton.style.display = 'none';
+            } else {
+                uploadButtonWrapper.style.display = 'none';
+                postButtonWrapper.style.display = 'none';
+                followButton.style.display = 'block';
+                followButton.textContent = data.following ? 'Unfollow' : 'Follow';
+                followButton.addEventListener('click', () => {
+                    handleFollowButton(userId, followButton);
+                });
             }
             
             loadUserVideos(userId, '/most_viewed');
@@ -56,11 +64,26 @@ fetch(`/api/username/${username}`)
     });
 });
 
+function handleFollowButton(followedUserId, button) {
+    fetch('/follow', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ followedUserId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        button.textContent = button.textContent === 'Follow' ? 'Unfollow' : 'Follow';
+    })
+    .catch(error => {
+        console.error('Error handling follow/unfollow:', error);
+    });
+}
+
 function showTab(tabId, tabLink) {
-    console.log('Showing tab:', tabId);
     const tabs = document.querySelectorAll('.tab-content');
     const tabLinks = document.querySelectorAll('.channel-tabs ul li');
-    console.log(tabs);
     tabs.forEach(tab => {
         tab.style.display = 'none';
     });
@@ -100,8 +123,6 @@ function loadUserVideos(userId, endpoint) {
             while (videosContainer.firstChild) {
                 videosContainer.removeChild(videosContainer.firstChild);
             }
-
-            console.log(data);
 
             data.rows.forEach(video => {
                 const videoItem = document.createElement('div');

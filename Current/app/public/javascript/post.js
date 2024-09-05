@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.signedIn) {
                 const userInfo = data.userInfo;
-                document.getElementById('username-display').textContent = userInfo.username;
-                document.getElementById('avatar-display').src = userInfo.profilePicture;
+                document.getElementById('username').textContent = userInfo.username;
+                document.getElementById('avatar').src = userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
             }
         })
         .catch(error => console.error('Error fetching user info:', error));
@@ -28,8 +28,6 @@ document.getElementById('content-form').addEventListener('submit', function (eve
     let comment = document.getElementById('comment-input').value;
 
     let formData = new FormData(this);
-    formData.append('subject', subject);
-    formData.append('comment', comment);
 
     let actionUrl = `/post?subject=${encodeURIComponent(subject)}&comment=${encodeURIComponent(comment)}`;
 

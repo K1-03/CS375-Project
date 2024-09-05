@@ -29,6 +29,11 @@ body {
     width: 100%;
 }
 
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
 .header-top {
     display: flex;
     align-items: center;
@@ -62,7 +67,6 @@ body {
 
 .button-wrapper {
     margin-left: 0;
-    width: 6.5%;
 }
 
 .create-button {
@@ -80,14 +84,21 @@ body {
     background-color: #5a6268;
 }
 
-.button-container {
-    display: flex;     
-    gap: 1px;          
-    width: 100%;        
+#follow-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
 }
 
-
-#post-button:hover {
+#follow-button:hover {
     background-color: #5a6268;
 }
 

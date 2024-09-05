@@ -24,25 +24,6 @@
             <p id="textContent"></p>
             <p id="uploadDate"></p>
         </div>
-        <!-- <div class="video-player" id="video-player">
-        </div>
-        <p id="video-title"></p>
-        <div id="insights">
-            <div id="insights-data">
-                <span id="views-count"></span> Views | 
-                <span id="likes-count"></span> Likes | 
-                <span id="dislikes-count"></span> Dislikes
-            </div>
-            <div id="insights-buttons">
-                <button id="like" type="button">Like</button>
-                <button id="dislike" type="button">Dislike</button>
-            </div>
-        </div>
-        <div id="description-box"> 
-            <p id="upload-date"> </p>
-            <p id="description-text"> </p>
-        </div>
-    -->
         <div id="comment-section">
             <div class="comment-box">
                 <img src="/images/Placeholder_Profile_Image.jpg" alt="User Avatar" class="comment-avatar" id="avatar-preview">
@@ -52,28 +33,9 @@
                 <button id="cancel-button">Cancel</button>
                 <button id="comment-button" disabled>Comment</button>
             </div>
-            <div id="comments">
-
-            </div>
+            <div id="comments"></div>
         </div>
     </main>
     <script src="/javascript/view-post.js"></script>
-    <script>
-        // Fetch user info and update avatar and username
-        async function updateUserInfo() {
-            try {
-                let response = await fetch('/user_info');
-                let data = await response.json();
-                if (data.signedIn) {
-                    document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
-                    document.getElementById('avatar-preview').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
-                    document.getElementById('username').textContent = data.userInfo.username || 'Guest';
-                }
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-            }
-        }
-        updateUserInfo();
-    </script>
 </body>
 </html>

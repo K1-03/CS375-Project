@@ -22,16 +22,16 @@
             <div id="forum-post-preview">
                 <form id="content-form">
                     <div id="post-info">
-                        <label for="subject">Subject</label><br>
+                        <label for="subject-input">Subject</label><br>
                         <textarea id="subject-input" name="subject" maxlength="80" style="height: 50px;"></textarea>
                         <div id="subject-counter" class="char-counter">0/80</div>
                         <br>
-                        <label for="comment">Post Body</label><br>
+                        <label for="comment-input">Post Body</label><br>
                         <textarea id="comment-input" name="comment" maxlength="1000"
                             style="height: 100px"></textarea>
                         <div id="comment-counter" class="char-counter">0/1000</div>
                     </div>
-                    <label for="choose-image">Choose Post Image (optional)</label>
+                    <label for="postImage">Choose Post Image (optional)</label>
                     <input type="file" name="postImage" id="postImage" accept="image/*">
                     <br><br> 
                     <button id="post" type="submit">Post</button>
@@ -39,22 +39,6 @@
             </div>
         </div>
         <script src="/javascript/post.js"></script>
-        <script>
-            // Fetch user info and update avatar and username
-            async function updateUserInfo() {
-                try {
-                    let response = await fetch('/user_info');
-                    let data = await response.json();
-                    if (data.signedIn) {
-                        document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
-                        document.getElementById('username').textContent = data.userInfo.username || 'Guest';
-                    }
-                } catch (error) {
-                    console.error('Error fetching user info:', error);
-                }
-            }
-            updateUserInfo();
-        </script>
     </body>
     
 </html>
