@@ -1,4 +1,15 @@
 let userId = null;
+
+function formatDate(date) {
+    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    let d = new Date(date);
+    let month = months[d.getMonth()];
+    let day = d.getDate();
+    let year = d.getFullYear();
+    
+    return `${month} ${day}, ${year}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const homeTabLink = document.querySelector('.channel-tabs ul li:first-child');
     showTab('home-tab', homeTabLink);
@@ -14,7 +25,8 @@ fetch(`/api/username/${username}`)
         const userNameElement = document.getElementById('user-name');
         const userUsernameElement = document.getElementById('user-username');
         const profilePictureElement = document.getElementById('profile-picture');
-        const uploadButtonWrapper = document.querySelector('.upload-button-wrapper');
+        const uploadButtonWrapper = document.getElementById('upload-button-wrapper');
+        const postButtonWrapper = document.getElementById('post-button-wrapper');
         // Display user information
         if (data.user) {
             const user = data.user;
@@ -31,6 +43,7 @@ fetch(`/api/username/${username}`)
 
             if (data.isOwner) {
                 uploadButtonWrapper.style.display = 'block';
+                postButtonWrapper.style.display = 'block';
             }
             
             loadUserVideos(userId, '/most_viewed');
@@ -115,4 +128,48 @@ function loadUserVideos(userId, endpoint) {
         .catch(error => {
             console.error('Error loading videos:', error);
         });
+}
+
+function loadUserPosts() {
+    if (!(document.getElementById("posts-container").className === "loaded")) {
+        fetch(`/user_posts?userid=${userId}`).then(async res => {
+            let posts = (await res.json()).posts;
+            posts.forEach(post => {
+                let postBox = document.createElement("div");
+                postBox.setAttribute("id", `post-${post.postid}`);
+                postBox.classList.add('post-box');
+
+                postBox.addEventListener("click", () => {
+                    window.location.href = `/view-post?postId=${post.postid}`;
+                });
+
+                let postTitle = document.createElement("h3");
+                let postContent = document.createElement("p");
+                let postDate = document.createElement("p");
+
+                postTitle.textContent = post.title;
+                postContent.textContent = post.textcontent;
+                postDate.textContent = formatDate(post.dateposted);
+
+                postDate.style.fontStyle = "italic";
+                postDate.style.fontSize = "10px";
+
+                postTitle.classList.add('post-title');
+                postContent.classList.add('post-content');
+
+                postBox.appendChild(postTitle);
+                if (post.postimage){
+                    let postImage = document.createElement("img");
+                    postImage.style.width = "200px";
+                    postImage.style.height = "200px";
+                    postImage.src = `/images/post_images/${post.postimage}`;
+                    postBox.appendChild(postImage);
+                }
+                postBox.appendChild(postContent);
+                postBox.appendChild(postDate);
+                document.getElementById("posts-container").appendChild(postBox);
+            });
+        });
+        document.getElementById("posts-container").className = "loaded";
+    }
 }

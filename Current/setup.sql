@@ -33,6 +33,7 @@ CREATE TABLE video_insights(
 
 CREATE TABLE comments(
     vid VARCHAR(64),
+    postId VARCHAR(64),
     commentId SERIAL PRIMARY KEY,
     userId INTEGER NOT NULL,
     parentCommentId INTEGER, /*commentId of potential parent comment is replying to*/
@@ -45,3 +46,13 @@ CREATE TABLE ratings(
     userId INTEGER NOT NULL,
     rating VARCHAR(7)
 );
+
+CREATE TABLE forum_post_information(
+    postId SERIAL PRIMARY KEY,
+    userId INTEGER NOT NULL,
+    postImage VARCHAR(255),  
+    textContent VARCHAR(1024) NULL NULL,
+    title VARCHAR(100) NOT NULL,
+    timePosted TIMESTAMP NOT NULL,
+    datePosted DATE NOT NULL
+)

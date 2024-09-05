@@ -60,12 +60,12 @@ body {
     color: #cccccc;
 }
 
-.upload-button-wrapper {
+.button-wrapper {
     margin-left: 0;
-    width: 100%;
+    width: 6.5%;
 }
 
-#upload-button {
+.create-button {
     padding: 10px 20px;
     background-color: #6c757d;
     color: #fff;
@@ -77,6 +77,17 @@ body {
 }
 
 #upload-button:hover {
+    background-color: #5a6268;
+}
+
+.button-container {
+    display: flex;     
+    gap: 1px;          
+    width: 100%;        
+}
+
+
+#post-button:hover {
     background-color: #5a6268;
 }
 
@@ -175,4 +186,46 @@ body {
     .channel-header p {
         font-size: 16px;
     }
+}
+
+#posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+}
+
+.post-box {
+    background-color: #2c2f33; 
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    cursor: pointer; 
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start; 
+    width: 100%;
+}
+
+.post-box:hover {
+    background-color: #3a3d42; 
+}
+
+.post-title {
+    color: #d18bff; 
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.post-content {
+    color: #cccccc;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-top: 5px;
+    white-space: pre-wrap; 
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+    max-width: 100%; 
 }

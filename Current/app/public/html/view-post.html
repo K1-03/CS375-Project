@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current - Video</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/view-post.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <a href="/" class="home-button">Current</a>
+        </div>
+        <div class="header-right">
+            <span id="username"></span>
+            <a href="/html/account.html"><img id="avatar" src="/images/Placeholder_Profile_Image.jpg" alt="Avatar" class="avatar"></a>
+        </div>
+    </header>
+    <main class="main" id="main">
+        <div id="post">
+            <p id="subject"></p>
+            <img id="optional-image" display="none">
+            <p id="textContent"></p>
+            <p id="uploadDate"></p>
+        </div>
+        <!-- <div class="video-player" id="video-player">
+        </div>
+        <p id="video-title"></p>
+        <div id="insights">
+            <div id="insights-data">
+                <span id="views-count"></span> Views | 
+                <span id="likes-count"></span> Likes | 
+                <span id="dislikes-count"></span> Dislikes
+            </div>
+            <div id="insights-buttons">
+                <button id="like" type="button">Like</button>
+                <button id="dislike" type="button">Dislike</button>
+            </div>
+        </div>
+        <div id="description-box"> 
+            <p id="upload-date"> </p>
+            <p id="description-text"> </p>
+        </div>
+    -->
+        <div id="comment-section">
+            <div class="comment-box">
+                <img src="/images/Placeholder_Profile_Image.jpg" alt="User Avatar" class="comment-avatar" id="avatar-preview">
+                <input type="text" id="comment-input" placeholder="Add a comment..." maxlength="500">
+            </div>
+            <div id="comment-buttons">
+                <button id="cancel-button">Cancel</button>
+                <button id="comment-button" disabled>Comment</button>
+            </div>
+            <div id="comments">
+
+            </div>
+        </div>
+    </main>
+    <script src="/javascript/view-post.js"></script>
+    <script>
+        // Fetch user info and update avatar and username
+        async function updateUserInfo() {
+            try {
+                let response = await fetch('/user_info');
+                let data = await response.json();
+                if (data.signedIn) {
+                    document.getElementById('avatar').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+                    document.getElementById('avatar-preview').src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+                    document.getElementById('username').textContent = data.userInfo.username || 'Guest';
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+            }
+        }
+        updateUserInfo();
+    </script>
+</body>
+</html>
