@@ -18,7 +18,7 @@ header {
     padding: 10px 20px;
     width: 100%;
     box-sizing: border-box;
-    position: relative;
+    position: fixed;
     z-index: 1000;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -135,12 +135,52 @@ header {
     padding: 20px;
 }
 
-.thumbnails img {
+.thumbnail-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    background-color: #282c34; 
+    border-radius: 10px;
     width: 500px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.thumbnail-item img.thumbnail {
+    width: 100%; 
     height: 300px;
     object-fit: cover;
     border-radius: 10px;
-    margin: 10px;
+}
+
+.thumbnail-item .owner-info {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+
+.thumbnail-item .user-profile-pic {
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.thumbnail-item .username {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+#thumbnails-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; 
 }
 
 .dropdown {

@@ -17,50 +17,100 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = window.location.pathname.split('/')[1];
 
 
-fetch(`/api/username/${username}`)
-    .then(response => response.json())
-    .then(data => {
-        const userNameElement = document.getElementById('user-name');
-        const userUsernameElement = document.getElementById('user-username');
-        const profilePictureElement = document.getElementById('profile-picture');
-        const followButton = document.getElementById('follow-button');
-        const uploadButtonWrapper = document.getElementById('upload-button-wrapper');
-        const postButtonWrapper = document.getElementById('post-button-wrapper');
-        // Display user information
-        if (data.user) {
-            const user = data.user;
-            userId = user.id;
-            if (user.first_name && user.last_name) {
-                userNameElement.textContent = `${user.first_name} ${user.last_name}`;
-            }
-            if (user.username) {
-                userUsernameElement.textContent = `@${user.username}`;
-            }
-            if (user.profile_picture) {
-                profilePictureElement.src = user.profile_picture;
-            }
+    fetch(`/api/username/${username}`)
+        .then(response => response.json())
+        .then(data => {
+            const userNameElement = document.getElementById('user-name');
+            const userUsernameElement = document.getElementById('user-username');
+            const profilePictureElement = document.getElementById('profile-picture');
+            const followButton = document.getElementById('follow-button');
+            const uploadButtonWrapper = document.getElementById('upload-button-wrapper');
+            const postButtonWrapper = document.getElementById('post-button-wrapper');
+            // Display user information
+            if (data.user) {
+                const user = data.user;
+                userId = user.id;
+                if (user.first_name && user.last_name) {
+                    userNameElement.textContent = `${user.first_name} ${user.last_name}`;
+                }
+                if (user.username) {
+                    userUsernameElement.textContent = `@${user.username} • ${user.followerCount} followers • ${user.video_count} videos`;
+                }
+                if (user.profile_picture) {
+                    profilePictureElement.src = user.profile_picture;
+                }
 
-            if (data.isOwner) {
-                uploadButtonWrapper.style.display = 'block';
-                postButtonWrapper.style.display = 'block';
-                followButton.style.display = 'none';
+                if (data.isOwner) {
+                    uploadButtonWrapper.style.display = 'block';
+                    postButtonWrapper.style.display = 'block';
+                    followButton.style.display = 'none';
+                } else {
+                    uploadButtonWrapper.style.display = 'none';
+                    postButtonWrapper.style.display = 'none';
+                    followButton.style.display = 'block';
+                    followButton.textContent = data.following ? 'Unfollow' : 'Follow';
+                    followButton.addEventListener('click', () => {
+                        handleFollowButton(userId, followButton);
+                    });
+                }
+                
+                loadUserVideos(userId, '/most_viewed');
             } else {
-                uploadButtonWrapper.style.display = 'none';
-                postButtonWrapper.style.display = 'none';
-                followButton.style.display = 'block';
-                followButton.textContent = data.following ? 'Unfollow' : 'Follow';
-                followButton.addEventListener('click', () => {
-                    handleFollowButton(userId, followButton);
-                });
+                console.error('User data missing.');
             }
-            
-            loadUserVideos(userId, '/most_viewed');
+        })
+        .catch(error => {
+            console.error('Error fetching user information:', error);
+        });
+
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const signinLink = document.getElementById('signin-link');
+    const usernameDisplay = document.getElementById('username-display');
+    const avatar = document.getElementById('avatar');
+
+    fetch('/user_info').then(response => {
+        if (response.ok) {
+            return response.json();
         } else {
-            console.error('User data missing.');
+            throw Error("Failed to retrieve user info.");
         }
-    })
-    .catch(error => {
-        console.error('Error fetching user information:', error);
+    }).then(data => {
+        if (data.signedIn) {
+            signinLink.style.display = 'none'; // Hide 'Sign In' link
+            usernameDisplay.textContent = data.userInfo.username; // Display username
+            avatar.src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
+            dropdownMenu.innerHTML = `
+                <a href="/${data.userInfo.username}">Channel</a>
+                <a href="/account">Account</a>
+                <a href="/upload">Upload</a>
+                <a id="logout-link" href="#">Logout</a>
+            `;
+
+            // Add logout functionality
+            document.getElementById("logout-link").addEventListener("click", (event) => {
+                event.preventDefault();
+                fetch('/logout', {
+                    method: 'POST'
+                }).then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw Error("Failed to log out.");
+                    }
+                }).then(data => {
+                    alert(data.message);
+                    window.location.href = data.redirect; // Redirect to homepage
+                }).catch(err => {
+                    console.error(err);
+                });
+            });
+        } else {
+            usernameDisplay.textContent = '';
+            avatar.src = '/images/Placeholder_Profile_Image.jpg';  
+            signinLink.style.display = 'block';        
+        }
+    }).catch(err => {
+        console.error(err);
     });
 });
 

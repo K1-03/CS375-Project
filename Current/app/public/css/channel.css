@@ -5,6 +5,82 @@ body {
     background-color: #121212; 
     color: #ffffff; 
     display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #282c34;
+    color: white;
+    padding: 10px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.home-button {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-right #username, .header-right #username-display {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.header-right .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.account-main {
+    display: flex;
+    width: 100%;
+    padding: 20px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #282c34;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+}
+
+.dropdown-menu a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-menu a:hover {
+    background-color: #575757;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
 }
 
 .channel-container {

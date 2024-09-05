@@ -256,21 +256,26 @@ app.post('/comment', (req, res) => {
 
 app.get('/newest_first', async (req, res) => {
   try{
-    let result = await pool.query("SELECT * FROM video_information ORDER BY uploadtime DESC;");
-
+    let result = await pool.query(`
+      SELECT video_information.*, users.profile_picture, users.username
+      FROM video_information
+      JOIN users ON video_information.userId = users.id
+      ORDER BY video_information.uploadtime DESC;
+      `);
+    /*
     let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
       return element.includes(req.query.vid);
     });
+    */
 
-    res.status(200);
-    res.json({
+    res.status(200).json({
       rows: result.rows,
       length: result.rowCount
     });
   }
   catch(error){
-    res.status(500);
-    res.send(error);
+    console.error('Error fetching newest video:', error);
+    res.status(500).send(error);
   }
 });
 
@@ -543,16 +548,26 @@ app.get('/api/username/:username', async (req, res) => {
         following = followCheck.rows.length > 0;
       }
 
+      const followerCountResult = await pool.query('SELECT COUNT(*) FROM follows WHERE followee_id = $1', [user.id]);
+      const followerCount = followerCountResult.rows[0]?.count;
+      
+
+      const videoCountResult = await pool.query('SELECT COUNT(*) FROM video_information WHERE userId = $1', [user.id]);
+      const videoCount = videoCountResult.rows[0]?.count;
+
       res.json({
         user: {
           id: user.id,
           first_name: user.first_name,
           last_name: user.last_name,
           username: user.username,
-          profile_picture: user.profile_picture || '/images/Placeholder_Profile_Image.jpg'
+          profile_picture: user.profile_picture || '/images/Placeholder_Profile_Image.jpg',
+          followerCount: followerCount,
+          video_count: videoCount
         },
         isOwner: isOwner,
-        following: !isOwner ? following : null
+        following: !isOwner ? following : null,
+        followerCount: followerCount
       });
     } else {
       res.status(404).send('User not found');
