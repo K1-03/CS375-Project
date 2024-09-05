@@ -421,7 +421,7 @@ app.get ('/signup', (req, res) => {
 app.get('/user_posts', async (req, res) => {
   try{
     if(req.query.userid){
-      let result = await pool.query("SELECT * FROM forum_post_information WHERE userid= $1", [req.query.userid]);
+      let result = await pool.query("SELECT * FROM forum_post_information WHERE userid= $1 ORDER BY timePosted DESC", [req.query.userid]);
 
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'No posts found' });
