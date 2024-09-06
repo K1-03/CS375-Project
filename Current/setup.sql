@@ -52,6 +52,7 @@ CREATE TABLE follows (
     followee_id INT REFERENCES users(id),
     PRIMARY KEY (follower_id, followee_id)
 );
+
 CREATE TABLE forum_post_information(
     postId SERIAL PRIMARY KEY,
     userId INTEGER NOT NULL,
@@ -60,4 +61,4 @@ CREATE TABLE forum_post_information(
     title VARCHAR(100) NOT NULL,
     timePosted TIMESTAMP NOT NULL,
     datePosted DATE NOT NULL
-)
+);
