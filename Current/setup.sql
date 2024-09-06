@@ -60,4 +60,4 @@ CREATE TABLE forum_post_information(
     title VARCHAR(100) NOT NULL,
     timePosted TIMESTAMP NOT NULL,
     datePosted DATE NOT NULL
-)
+);
