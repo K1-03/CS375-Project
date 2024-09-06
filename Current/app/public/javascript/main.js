@@ -2,83 +2,104 @@ document.addEventListener("DOMContentLoaded", () => {
     let thumbnails = [];
 
     function displayThumbnails(filteredThumbnails) {
-        let thumbnailsContainer = document.getElementById("thumbnails-container");
-        thumbnailsContainer.innerHTML = "";
-        filteredThumbnails.forEach(thumbnail => {
-            let thumbnailDiv = document.createElement("div");
-            thumbnailDiv.className = "thumbnail-item";
+    let thumbnailsContainer = document.getElementById("thumbnails-container");
+    thumbnailsContainer.innerHTML = "";
+    filteredThumbnails.forEach(thumbnail => {
+        let thumbnailDiv = document.createElement("div");
+        thumbnailDiv.className = "thumbnail-item";
 
-            let img = document.createElement("img");
-            img.src = thumbnail.src;
-            img.className = "thumbnail";
-            thumbnailDiv.addEventListener("click", () => {
-                window.location.href = thumbnail.link;
-            });
-
-            let title = document.createElement("p");
-            title.textContent = thumbnail.title;
-            title.className = "thumbnail-title";
-
-            let ownerInfoDiv = document.createElement("div");
-            ownerInfoDiv.className = "owner-info";
-
-            let userProfilePic = document.createElement("img");
-            userProfilePic.src = thumbnail.profile_picture || '/images/Placeholder_Profile_Image.jpg';
-            userProfilePic.className = "user-profile-pic";
-
-            userProfilePic.addEventListener("click", (event) => {
-                event.stopPropagation();
-                window.location.href = `/${thumbnail.username}`;
-            });
-    
-            let username = document.createElement("p");
-            username.textContent = thumbnail.username;
-            username.className = "username";
-    
-            ownerInfoDiv.appendChild(userProfilePic);
-            ownerInfoDiv.appendChild(username);
-
-            username.addEventListener("click", (event) => {
-                event.stopPropagation(); // Prevent event from bubbling up to thumbnailDiv
-                window.location.href = `/${thumbnail.username}`;
-            });
-    
-            thumbnailDiv.appendChild(img);
-            thumbnailDiv.appendChild(title);
-            thumbnailDiv.appendChild(ownerInfoDiv);
-            thumbnailsContainer.appendChild(thumbnailDiv);
+        let img = document.createElement("img");
+        img.src = thumbnail.src;
+        img.className = "thumbnail";
+        thumbnailDiv.addEventListener("click", () => {
+            window.location.href = thumbnail.link;
         });
-    }
 
-    fetch("/newest_first").then(response => {
+        let title = document.createElement("p");
+        title.textContent = thumbnail.title;
+        title.className = "thumbnail-title";
+
+        let ownerInfoDiv = document.createElement("div");
+        ownerInfoDiv.className = "owner-info";
+
+        let userProfilePic = document.createElement("img");
+        userProfilePic.src = thumbnail.profile_picture || '/images/Placeholder_Profile_Image.jpg';
+        userProfilePic.className = "user-profile-pic";
+
+        userProfilePic.addEventListener("click", (event) => {
+            event.stopPropagation();
+            window.location.href = `/${thumbnail.username}`;
+        });
+
+        let username = document.createElement("p");
+        username.textContent = thumbnail.username;
+        username.className = "username";
+
+        let insightsContainer = document.createElement("div");
+        insightsContainer.className = "insights-container";
+
+        let viewsCount = document.createElement("p");
+        viewsCount.textContent = `Views: ${thumbnail.view_count}`;
+
+        let likesCount = document.createElement("p");
+        likesCount.textContent = `Likes: ${thumbnail.like_count}`;
+
+        let commentsCount = document.createElement("p");
+        commentsCount.textContent = `Comments: ${thumbnail.comment_count}`;
+
+        insightsContainer.appendChild(viewsCount);
+        insightsContainer.appendChild(likesCount);
+        insightsContainer.appendChild(commentsCount);
+
+        ownerInfoDiv.appendChild(userProfilePic);
+        ownerInfoDiv.appendChild(username);
+        ownerInfoDiv.appendChild(insightsContainer); // Added insights to ownerInfoDiv
+
+        thumbnailDiv.appendChild(img);
+        thumbnailDiv.appendChild(title);
+        thumbnailDiv.appendChild(ownerInfoDiv);
+        thumbnailsContainer.appendChild(thumbnailDiv);
+    });
+}
+
+    fetch("/newest_first")
+    .then(response => {
         if (response.ok) {
             return response.json();
         } else {
             throw Error("Something Went Wrong");
         }
-    }).then(data => {
+    })
+    .then(data => {
         console.log('Fetched Data:', data);
         thumbnails = data.rows.map(row => ({
             id: row.thumbnail,
             src: `/images/thumbnails/${row.thumbnail}`,
             link: `/video?vid=${row.vid}`,
-            title: `${row.title}`,
+            title: row.title,
+            tags: row.tags,
             profile_picture: row.profile_picture || '/images/Placeholder_Profile_Image.jpg',
-            username: row.username
+            username: row.username,
+            view_count: row.view_count,
+            like_count: row.like_count,
+            comment_count: row.comment_count
         }));
         displayThumbnails(thumbnails);
-    }).catch(err => {
-        console.log(err);
+    })
+    .catch(err => {
+        console.error(err);
     });
 
     // Fetch user info to update dropdown and display username
-    fetch("/user_info").then(response => {
+    fetch("/user_info")
+    .then(response => {
         if (response.ok) {
             return response.json();
         } else {
             throw Error("Failed to retrieve user info.");
         }
-    }).then(data => {
+    })
+    .then(data => {
         let dropdownMenu = document.getElementById("dropdown-menu");
         let signinLink = document.getElementById("signin-link");
         let usernameDisplay = document.getElementById("username-display");
@@ -118,10 +139,10 @@ document.addEventListener("DOMContentLoaded", () => {
             avatar.src = '/images/Placeholder_Profile_Image.jpg';  
             signinLink.style.display = 'block';        
         }
-    }).catch(err => {
+    })
+    .catch(err => {
         console.error(err);
     });
-
     fetch('/followed_channels')
         .then(response => response.json())
         .then(data => {
@@ -173,7 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let searchBar = document.getElementById("search-bar");
     searchBar.addEventListener("input", () => {
         let filteredThumbnails = thumbnails.filter(thumbnail => {
-            return thumbnail.title.toLowerCase().includes(searchBar.value.toLowerCase());
+            console.log(thumbnail.tags);
+            return thumbnail.title.toLowerCase().includes(searchBar.value.toLowerCase()) || thumbnail.tags.toLowerCase().includes(searchBar.value.toLowerCase());
         });
         displayThumbnails(filteredThumbnails);
     });
@@ -196,69 +218,93 @@ document.addEventListener("DOMContentLoaded", () => {
     let mostLikedButton = document.getElementById("most-liked");
 
     newestFirstButton.addEventListener("click", event => {
-        fetch("/newest_first").then(response => {
+        fetch("/newest_first")
+        .then(response => {
             if (response.ok) {
                 return response.json();
             } else {
                 throw Error("Something Went Wrong");
             }
-        }).then(data => {
-            for (let i = 0; i < data.length; ++i) {
-                thumbnails[i] = {
-                    id: data.rows[i].thumbnail,
-                    src: `/images/thumbnails/${data.rows[i].thumbnail}`,
-                    link: `/video?vid=${data.rows[i].vid}`,
-                    title: `${data.rows[i].title}`
-                };
-            }
+        })
+        .then(data => {
+            console.log('Fetched Data:', data);
+            thumbnails = data.rows.map(row => ({
+                id: row.thumbnail,
+                src: `/images/thumbnails/${row.thumbnail}`,
+                link: `/video?vid=${row.vid}`,
+                title: row.title,
+                tags: row.tags,
+                profile_picture: row.profile_picture || '/images/Placeholder_Profile_Image.jpg',
+                username: row.username,
+                view_count: row.view_count,
+                like_count: row.like_count,
+                comment_count: row.comment_count
+            }));
             displayThumbnails(thumbnails);
-        }).catch(err => {
-            console.log(err);
+        })
+        .catch(err => {
+            console.error(err);
         });
-    })
+    });
 
 
     mostPopularButton.addEventListener("click", event => {
-        fetch("/most_popular").then(response => {
+        fetch("/most_popular")
+        .then(response => {
             if (response.ok) {
                 return response.json();
             } else {
                 throw Error("Something Went Wrong");
             }
-        }).then(data => {
-            for (let i = 0; i < data.length; ++i) {
-                thumbnails[i] = {
-                    id: data.rows[i].thumbnail,
-                    src: `/images/thumbnails/${data.rows[i].thumbnail}`,
-                    link: `/video?vid=${data.rows[i].vid}`,
-                    title: `${data.rows[i].title}`
-                };
-            }
+        })
+        .then(data => {
+            console.log('Fetched Data:', data);
+            thumbnails = data.rows.map(row => ({
+                id: row.thumbnail,
+                src: `/images/thumbnails/${row.thumbnail}`,
+                link: `/video?vid=${row.vid}`,
+                title: row.title,
+                tags: row.tags,
+                profile_picture: row.profile_picture || '/images/Placeholder_Profile_Image.jpg',
+                username: row.username,
+                view_count: row.view_count,
+                like_count: row.like_count,
+                comment_count: row.comment_count
+            }));
             displayThumbnails(thumbnails);
-        }).catch(err => {
-            console.log(err);
+        })
+        .catch(err => {
+            console.error(err);
         });
-    })
+    });
 
     mostLikedButton.addEventListener("click", event => {
-        fetch("/most_liked").then(response => {
+        fetch("/most_liked")
+        .then(response => {
             if (response.ok) {
                 return response.json();
             } else {
                 throw Error("Something Went Wrong");
             }
-        }).then(data => {
-            for (let i = 0; i < data.length; ++i) {
-                thumbnails[i] = {
-                    id: data.rows[i].thumbnail,
-                    src: `/images/thumbnails/${data.rows[i].thumbnail}`,
-                    link: `/video?vid=${data.rows[i].vid}`,
-                    title: `${data.rows[i].title}`
-                };
-            }
+        })
+        .then(data => {
+            console.log('Fetched Data:', data);
+            thumbnails = data.rows.map(row => ({
+                id: row.thumbnail,
+                src: `/images/thumbnails/${row.thumbnail}`,
+                link: `/video?vid=${row.vid}`,
+                title: row.title,
+                tags: row.tags,
+                profile_picture: row.profile_picture || '/images/Placeholder_Profile_Image.jpg',
+                username: row.username,
+                view_count: row.view_count,
+                like_count: row.like_count,
+                comment_count: row.comment_count
+            }));
             displayThumbnails(thumbnails);
-        }).catch(err => {
-            console.log(err);
+        })
+        .catch(err => {
+            console.error(err);
         });
     });
 });

@@ -28,6 +28,8 @@ html, body {
     display: none;
     margin-left: 10px;
     margin-right: 10px;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 #insights {
@@ -84,7 +86,25 @@ html, body {
     cursor: pointer;
 }
 
+.uploader-info {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+}
 
+.uploader-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.uploader-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+}
 
 #comment-section {
     display: none;

@@ -5,15 +5,15 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #121212; /* Dark mode background */
-    color: #ffffff; /* Light text for dark mode */
+    background-color: #00274d; /* Dark blue background */
+    color: #ffffff;
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #282c34;
+    background-color: #013b68; /* Slightly darker blue */
     color: white;
     padding: 10px 20px;
     width: 100%;
@@ -54,6 +54,7 @@ header {
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
+    border: 2px solid #013b68; /* Slightly darker blue */
 }
 
 .account-main {
@@ -64,7 +65,7 @@ header {
 
 #sidebar {
     width: 250px;
-    background-color: #282c34;
+    background-color: #013b68; /* Slightly darker blue */
     font-size: 20px;
     padding: 20px;
     height: calc(100vh - 60px);
@@ -86,7 +87,7 @@ header {
     align-items: center;
     padding: 10px;
     border-radius: 10px;
-    background-color: #282c34;
+    background-color: #0277bd; /* Slightly darker blue */
     width: 100%;
     box-sizing: border-box;
     position: relative;
@@ -94,7 +95,7 @@ header {
 }
 
 .channel-container:hover {
-    background-color: #575757;
+    background-color: #01579b; /* Slightly darker blue */
 }
 
 .channel-profile-pic {
@@ -112,7 +113,7 @@ header {
 
 .sidebar {
     width: 200px;
-    background-color: #282c34;
+    background-color: #013b68; /* Slightly darker blue */
     padding: 20px;
     height: 100vh;
 }
@@ -127,12 +128,24 @@ header {
 }
 
 .sidebar a:hover {
-    background-color: #575757;
+    background-color: #013b68; /* Slightly darker blue */
 }
 
 .account-content {
     flex-grow: 1;
     padding: 20px;
+}
+
+#thumbnails-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+    justify-items: center;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    margin-top: 80px;
+    box-sizing: border-box;
 }
 
 .thumbnail-item {
@@ -141,11 +154,12 @@ header {
     align-items: center;
     margin: 10px;
     padding: 10px;
-    background-color: #282c34; 
+    background-color: #013b68; /* Slightly darker blue */
     border-radius: 10px;
     width: 500px;
     box-sizing: border-box;
     text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .thumbnail-item img.thumbnail {
@@ -163,12 +177,12 @@ header {
     justify-content: flex-start;
 }
 
-
 .thumbnail-item .user-profile-pic {
     width: 40px; 
     height: 40px; 
     border-radius: 50%;
     margin-right: 10px;
+    border: 2px solid #01579b; /* Slightly darker blue */
 }
 
 .thumbnail-item .username {
@@ -176,11 +190,17 @@ header {
     color: #ffffff;
 }
 
-#thumbnails-container {
+.insights-container {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px; 
+    margin-left: 60px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.insights-container p {
+    margin: 0;
+    margin-right: 15px;
 }
 
 .dropdown {
@@ -191,7 +211,7 @@ header {
 .dropdown-menu {
     display: none;
     position: absolute;
-    background-color: #282c34;
+    background-color: #01579b; /* Slightly darker blue */
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
@@ -206,7 +226,7 @@ header {
 }
 
 .dropdown-menu a:hover {
-    background-color: #575757;
+    background-color: #013b68; /* Slightly darker blue */
 }
 
 .dropdown:hover .dropdown-menu {
@@ -226,8 +246,8 @@ header {
 }
 
 .menu {
-    background-color: #121212;
-    border: 2px solid rgb(42, 42, 42);
+    background-color: #01477c; /* Slightly darker blue */
+    border: 2px solid #014c8c; /* Even darker blue */
     color: #ffffff; 
     border-radius: 12px;
     padding: 10px 20px; 
@@ -240,14 +260,14 @@ header {
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: #121212;; 
+    background-color: #014981; /* Slightly darker blue */
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); 
     border-radius: 5px; 
     z-index: 1;
 }
 
 .sort-options button {
-    background-color: #121212; 
+    background-color: #015291; /* Slightly darker blue */
     color: #ffffff;
     border: none;
     padding: 12px 16px; 
@@ -259,10 +279,19 @@ header {
 }
 
 .sort-options button:hover {
-    background-color: #575757; 
+    background-color: #014c8c; /* Even darker blue */
 }
 
 #sort .menu:hover {
-    background-color: #575757; 
+    background-color: #014c8c; /* Even darker blue */
     color: #ffffff; 
+}
+
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
 }
