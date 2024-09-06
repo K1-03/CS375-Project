@@ -87,8 +87,8 @@ header {
     align-items: center;
     padding: 10px;
     border-radius: 10px;
-    background-color: #0277bd; /* Slightly darker blue */
-    width: 100%;
+    background-color: #013b68;
+    opacity: 0.8;
     box-sizing: border-box;
     position: relative;
     transition: background-color 0.3s, box-shadow 0.3s;
@@ -96,6 +96,7 @@ header {
 
 .channel-container:hover {
     background-color: #01579b; /* Slightly darker blue */
+    opacity: 1;
 }
 
 .channel-profile-pic {
