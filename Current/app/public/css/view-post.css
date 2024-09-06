@@ -4,14 +4,32 @@ html, body {
     overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-.header-right {
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    background-color: #121212; /* Dark mode background */
+    color: #ffffff; /* Light text for dark mode */
 }
 
-.header-right #username, .header-right #username-display {
-    margin-right: 10px;
-    font-size: 18px;
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #282c34;
+    color: white;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+.home-button {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    margin-left: 20px;
 }
 
 .header-right .avatar {
@@ -19,7 +37,15 @@ html, body {
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
+    margin-right: 20px;
 }
+
+.account-main {
+    display: flex;
+    width: 100%;
+    padding: 20px;
+}
+
 
 #post {
     width: 95vw;

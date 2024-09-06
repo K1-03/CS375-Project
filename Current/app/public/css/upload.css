@@ -23,6 +23,7 @@ header {
     color: white;
     text-decoration: none;
     font-size: 24px;
+    margin-left: 20px;
 }
 
 .header-center input {
@@ -45,6 +46,7 @@ header {
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
+    margin-right: 20px;
 }
 
 #main {
