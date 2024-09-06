@@ -179,6 +179,34 @@ app.get('/stream', (req, res) => {
   res.sendFile(path.join(__dirname,'public', 'videos', req.query.file));
 });
 
+app.get('/rate', async (req, res) => {
+  if (req.cookies.userInfo) {
+      const userId = req.cookies.userInfo.id;
+      const vid = req.query.vid;
+
+      try {
+          
+          const result = await pool.query(
+              'SELECT rating FROM ratings WHERE vid=$1 AND userId=$2',
+              [vid, userId]
+          );
+
+          if (result.rowCount === 0) {
+              
+              res.json({ rating: null });
+          } else {
+              
+              res.json({ rating: result.rows[0].rating });
+          }
+      } catch (err) {
+          console.error('Error retrieving rating:', err);
+          res.status(500).json({ message: 'Server error' });
+      }
+  } else {
+      res.status(401).json({ message: 'Must be signed in to check rating.' });
+  }
+});
+
 app.post('/rate', async (req, res) => {
   if (req.cookies.userInfo){
   try {
@@ -239,6 +267,11 @@ app.post('/comment', (req, res) => {
       if (req.body.vid){
         pool.query("INSERT INTO comments (vid, userId, timeCommented, content) VALUES ($1, $2, $3, $4)",
           [req.body.vid, req.cookies.userInfo.id, (new Date()).toISOString().slice(0, 19).replace('T', ' '), req.body.comment]);
+        
+        pool.query("UPDATE video_insights SET numberOfComments = (numberOfComments + 1) WHERE vid = $1",
+          [req.body.vid]
+        )
+
         res.send("Comment posted successfully");
       }
       else if (req.body.postId){
@@ -255,25 +288,26 @@ app.post('/comment', (req, res) => {
 });
 
 app.get('/newest_first', async (req, res) => {
-  try{
+  try {
     let result = await pool.query(`
-      SELECT video_information.*, users.profile_picture, users.username
+      SELECT 
+        video_information.*, 
+        users.profile_picture, 
+        users.username,
+        COALESCE(video_insights.views, 0) AS view_count,
+        COALESCE(video_insights.likes, 0) AS like_count,
+        COALESCE(video_insights.numberOfComments, 0) AS comment_count
       FROM video_information
       JOIN users ON video_information.userId = users.id
-      ORDER BY video_information.uploadtime DESC;
-      `);
-    /*
-    let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
-      return element.includes(req.query.vid);
-    });
-    */
+      LEFT JOIN video_insights ON video_information.vid = video_insights.vid
+      ORDER BY video_information.uploadTime DESC;
+    `);
 
     res.status(200).json({
       rows: result.rows,
       length: result.rowCount
     });
-  }
-  catch(error){
+  } catch (error) {
     console.error('Error fetching newest video:', error);
     res.status(500).send(error);
   }
@@ -281,7 +315,20 @@ app.get('/newest_first', async (req, res) => {
 
 app.get('/most_popular', async (req, res) => {
   try{
-    let result = await pool.query("SELECT * FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid ORDER BY vs.views DESC;");
+
+    let result = await pool.query(`
+      SELECT 
+        video_information.*, 
+        users.profile_picture, 
+        users.username,
+        COALESCE(video_insights.views, 0) AS view_count,
+        COALESCE(video_insights.likes, 0) AS like_count,
+        COALESCE(video_insights.numberOfComments, 0) AS comment_count
+      FROM video_information
+      JOIN users ON video_information.userId = users.id
+      LEFT JOIN video_insights ON video_information.vid = video_insights.vid
+      ORDER BY video_insights.views DESC;
+    `);
 
     let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
       return element.includes(req.query.vid);
@@ -301,7 +348,20 @@ app.get('/most_popular', async (req, res) => {
 
 app.get('/most_liked', async (req, res) => {
   try{
-    let result = await pool.query("SELECT * FROM video_information vi JOIN video_insights vs ON vi.vid = vs.vid ORDER BY vs.likes DESC;");
+
+    let result = await pool.query(`
+      SELECT 
+        video_information.*, 
+        users.profile_picture, 
+        users.username,
+        COALESCE(video_insights.views, 0) AS view_count,
+        COALESCE(video_insights.likes, 0) AS like_count,
+        COALESCE(video_insights.numberOfComments, 0) AS comment_count
+      FROM video_information
+      JOIN users ON video_information.userId = users.id
+      LEFT JOIN video_insights ON video_information.vid = video_insights.vid
+      ORDER BY video_insights.likes DESC;
+    `);
 
     let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
       return element.includes(req.query.vid);

@@ -86,39 +86,80 @@ commentButton.addEventListener('click', async () =>{
   commentButton.classList.remove('active');
 });
 
-document.getElementById("like").addEventListener("click", (event) => {
-    fetch('/rate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          rating: "like",
-          vid: videoId
-        })
-      }).then(async response => {
-        if (response.status === 401){
-          alert(await response.text());
-        }
+async function updateLikeDislikeButtons() {
+  try {
+      let response = await fetch(`/rate?vid=${videoId}`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json'
+          }
       });
+      let data = await response.json();
+      let likeButton = document.getElementById("like");
+      let dislikeButton = document.getElementById("dislike");
+
+      if (data.rating === 'like') {
+          likeButton.textContent = 'Liked';
+          dislikeButton.textContent = 'Dislike';
+      } else if (data.rating === 'dislike') {
+          likeButton.textContent = 'Like';
+          dislikeButton.textContent = 'Disliked';
+      } else {
+          likeButton.textContent = 'Like';
+          dislikeButton.textContent = 'Dislike';
+      }
+  } catch (error) {
+      console.error('Error fetching rating:', error);
+  }
+}
+
+document.getElementById("like").addEventListener("click", async (event) => {
+  let likeButton = event.target;
+  let newRating = likeButton.textContent === 'Unlike' ? 'none' : 'like';
+
+  try {
+      await fetch('/rate', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              rating: newRating,
+              vid: videoId
+          })
+      });
+
+      updateLikeDislikeButtons();
+
+  } catch (error) {
+      console.error('Error updating rating:', error);
+  }
 });
 
-document.getElementById("dislike").addEventListener("click", (event) => {
-    fetch('/rate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          rating: "dislike",
-          vid: videoId
-        })
-      }).then(async response => {
-        if (response.status === 401){
-          alert(await response.text());
-        }
+document.getElementById("dislike").addEventListener("click", async (event) => {
+  let dislikeButton = event.target;
+  let newRating = dislikeButton.textContent === 'Undislike' ? 'none' : 'dislike';
+
+  try {
+      await fetch('/rate', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              rating: newRating,
+              vid: videoId
+          })
       });
+
+      
+      updateLikeDislikeButtons();
+      
+  } catch (error) {
+      console.error('Error updating rating:', error);
+  }
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
   let urlParams = new URLSearchParams(window.location.search);
@@ -226,6 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }).catch(error => {
           videoPlayer.innerHTML = `<p>${error.msg}</p>`;
       });
+      
+      updateLikeDislikeButtons();
+
   } else {
       videoPlayer.innerHTML = '<p>No video specified.</p>';
   }
