@@ -178,60 +178,84 @@ document.addEventListener('DOMContentLoaded', () => {
               });
           }
       }).then(info => {
-          let video = document.createElement('video');
-          video.setAttribute("id", "videoContent");
-          video.src = `stream?file=${info.file}`;
-          video.controls = true;
-          videoPlayer.appendChild(video);
+        console.log(info);
+        console.log(insights);
+        let video = document.createElement('video');
+        video.setAttribute("id", "videoContent");
+        video.src = `stream?file=${info.file}`;
+        video.controls = true;
+        videoPlayer.appendChild(video);
 
-          document.getElementById("video-title").innerText = info.title;
-          document.getElementById("description-box").style.display = "block";
-          document.getElementById("insights").style.display = "block";
-          document.getElementById("comment-section").style.display = "flex";
-          document.getElementById("upload-date").innerText = formatDate(info.uploadDate);
-          document.getElementById("description-text").innerText = info.description;
-          
-          info.comments.forEach(comment => {
-            fetch(`account_info?userId=${comment.userid}`)
-                .then(res => res.json())
-                .then(userInfo => {
-                    let commentElement = document.createElement('div');
-                    commentElement.setAttribute("id", `comment-${comment.commentid}`);
-                    commentElement.setAttribute("class", "comment-element");
-                    let profileImage = document.createElement('img');
-                    if (userInfo.profile_picture) {
-                      profileImage.setAttribute("src", `${userInfo.profile_picture}`);
-                    }
-                    else{
-                        profileImage.setAttribute("src", `/images/Placeholder_Profile_Image.jpg`);
-                    }
-                    profileImage.setAttribute("alt", `${userInfo.username}'s profile picture`);
-                    profileImage.setAttribute("class", "comment-avatar");
+        document.getElementById("video-title").innerText = info.title;
+        document.getElementById("description-box").style.display = "block";
+        document.getElementById("insights").style.display = "block";
+        document.getElementById("comment-section").style.display = "flex";
+        document.getElementById("upload-date").innerText = formatDate(info.uploadDate);
+        document.getElementById("description-text").innerText = info.description;
 
-                    let userName = document.createElement("a");
-                    let commentBody = document.createElement("p");
-                    let channelLink = document.createElement("a");
+        let uploaderInfoDiv = document.getElementById('uploader-info');
+        uploaderInfoDiv.innerHTML = '';
+
+        let uploaderProfileLink = document.createElement('a');
+        uploaderProfileLink.setAttribute("href", `/${info.username}`);
+        uploaderProfileLink.setAttribute("class", "uploader-link");
+
+        let uploaderProfileImage = document.createElement('img');
+        uploaderProfileImage.setAttribute("src", info.profile_picture || '/images/Placeholder_Profile_Image.jpg');
+        uploaderProfileImage.setAttribute("alt", `${info.first_name} ${info.last_name}'s profile picture`);
+        uploaderProfileImage.setAttribute("class", "uploader-avatar");
+
+        uploaderProfileLink.appendChild(uploaderProfileImage);
   
-                    userName.textContent = `@${userInfo.username}`;
-                    commentBody.textContent = `${comment.content}`;
+        let uploaderName = document.createElement('a');
+        uploaderName.textContent = `${info.first_name} ${info.last_name}`;
+        uploaderName.setAttribute("class", "uploader-name");
+        uploaderName.setAttribute("href", `/${info.username}`);
 
-                    userName.setAttribute("class", "username-channel-link");
-                    userName.setAttribute("href", `/${userInfo.username}`);
-                    channelLink.setAttribute("href", `/${userInfo.username}`);
-
-                    channelLink.appendChild(profileImage);
-                    commentElement.appendChild(channelLink);
-                    commentElement.appendChild(userName);
-                    commentElement.appendChild(commentBody);
-
-                    document.getElementById("comments").appendChild(commentElement);
-
+        uploaderInfoDiv.appendChild(uploaderProfileLink);
+        uploaderInfoDiv.appendChild(uploaderName);
+        
+        info.comments.forEach(comment => {
+          fetch(`account_info?userId=${comment.userid}`)
+              .then(res => res.json())
+              .then(userInfo => {
+                  let commentElement = document.createElement('div');
+                  commentElement.setAttribute("id", `comment-${comment.commentid}`);
+                  commentElement.setAttribute("class", "comment-element");
+                  let profileImage = document.createElement('img');
+                  if (userInfo.profile_picture) {
+                    profileImage.setAttribute("src", `${userInfo.profile_picture}`);
                   }
-                 )
-                .catch(error => {
-                    console.error('Error fetching user info:', error);
-                });
-        });
+                  else{
+                      profileImage.setAttribute("src", `/images/Placeholder_Profile_Image.jpg`);
+                  }
+                  profileImage.setAttribute("alt", `${userInfo.username}'s profile picture`);
+                  profileImage.setAttribute("class", "comment-avatar");
+
+                  let userName = document.createElement("a");
+                  let commentBody = document.createElement("p");
+                  let channelLink = document.createElement("a");
+
+                  userName.textContent = `@${userInfo.username}`;
+                  commentBody.textContent = `${comment.content}`;
+
+                  userName.setAttribute("class", "username-channel-link");
+                  userName.setAttribute("href", `/${userInfo.username}`);
+                  channelLink.setAttribute("href", `/${userInfo.username}`);
+
+                  channelLink.appendChild(profileImage);
+                  commentElement.appendChild(channelLink);
+                  commentElement.appendChild(userName);
+                  commentElement.appendChild(commentBody);
+
+                  document.getElementById("comments").appendChild(commentElement);
+
+                }
+                )
+              .catch(error => {
+                  console.error('Error fetching user info:', error);
+              });
+      });
 
           fetch(`video_insights?vid=${videoId}`).then(response => response.json()).then(insights => {
               document.getElementById("views-count").innerText = insights.views;

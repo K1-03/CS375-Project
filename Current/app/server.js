@@ -381,35 +381,38 @@ app.get('/most_liked', async (req, res) => {
 
 app.get('/video_info', async (req, res) =>{
   try{
-    let result = await pool.query("SELECT * FROM video_information WHERE vid=$1", [req.query.vid]);
+    let result = await pool.query(`SELECT video_information.*, users.first_name, users.last_name, users.username, users.profile_picture FROM video_information JOIN users ON video_information.userid = users.id WHERE video_information.vid=$1`, [req.query.vid]);
     let commentResult = await pool.query("SELECT * FROM comments WHERE vid=$1 ORDER BY commentid DESC", [req.query.vid]);
+
+    console.log(result.rows);
 
     if (result.rows.length === 1){
        let videoFileName = fs.readdirSync(path.join(__dirname,'public', 'videos')).find((element) => {
         return element.includes(req.query.vid);
        });
 
-       res.status(200);
-       res.json({
+      res.status(200).json({
         title: result.rows[0].title,
         description: result.rows[0].description,
         thumbnail: result.rows[0].thumbnail,
         account: result.rows[0].userid,
-        tags:   result.rows[0].tags,
+        tags: result.rows[0].tags,
         file: videoFileName,
         uploadDate: result.rows[0].uploaddate,
         uploadTime: result.rows[0].uploadtime,
+        first_name: result.rows[0].first_name,
+        last_name: result.rows[0].last_name,
+        username: result.rows[0].username,
+        profile_picture: result.rows[0].profile_picture,
         comments: commentResult.rows
     });
-    }
-    else{
-      res.status(404);
-      res.send(" Video Not Found :( ");
+    } else {
+      res.status(404).send(" Video Not Found :( ");
     }
   }
   catch(error){
-    res.status(500);
-    res.send(error);
+    console.log('Error occured:', error);
+    res.status(500).send(error);
   }
 });
 
@@ -527,7 +530,7 @@ app.get('/user_videos', async (req, res) => {
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
     }
-    const query = 'SELECT * FROM video_information WHERE userid = $1 ORDER BY uploaddate DESC';
+    const query = 'SELECT * FROM video_information WHERE userid = $1 ORDER BY uploaddate , uploadtime DESC';
     const result = await pool.query(query, [userId]);
 
     if (result.rows.length === 0) {
