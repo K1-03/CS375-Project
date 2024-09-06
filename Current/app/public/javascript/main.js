@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let img = document.createElement("img");
             img.src = thumbnail.src;
             img.className = "thumbnail";
-            img.addEventListener("click", () => {
+            thumbnailDiv.addEventListener("click", () => {
                 window.location.href = thumbnail.link;
             });
 
@@ -19,8 +19,33 @@ document.addEventListener("DOMContentLoaded", () => {
             title.textContent = thumbnail.title;
             title.className = "thumbnail-title";
 
+            let ownerInfoDiv = document.createElement("div");
+            ownerInfoDiv.className = "owner-info";
+
+            let userProfilePic = document.createElement("img");
+            userProfilePic.src = thumbnail.profile_picture || '/images/Placeholder_Profile_Image.jpg';
+            userProfilePic.className = "user-profile-pic";
+
+            userProfilePic.addEventListener("click", (event) => {
+                event.stopPropagation();
+                window.location.href = `/${thumbnail.username}`;
+            });
+    
+            let username = document.createElement("p");
+            username.textContent = thumbnail.username;
+            username.className = "username";
+    
+            ownerInfoDiv.appendChild(userProfilePic);
+            ownerInfoDiv.appendChild(username);
+
+            username.addEventListener("click", (event) => {
+                event.stopPropagation(); // Prevent event from bubbling up to thumbnailDiv
+                window.location.href = `/${thumbnail.username}`;
+            });
+    
             thumbnailDiv.appendChild(img);
             thumbnailDiv.appendChild(title);
+            thumbnailDiv.appendChild(ownerInfoDiv);
             thumbnailsContainer.appendChild(thumbnailDiv);
         });
     }
@@ -32,14 +57,15 @@ document.addEventListener("DOMContentLoaded", () => {
             throw Error("Something Went Wrong");
         }
     }).then(data => {
-        for (let i = 0; i < data.length; ++i) {
-            thumbnails[i] = {
-                id: data.rows[i].thumbnail,
-                src: `/images/thumbnails/${data.rows[i].thumbnail}`,
-                link: `/video?vid=${data.rows[i].vid}`,
-                title: `${data.rows[i].title}`
-            };
-        }
+        console.log('Fetched Data:', data);
+        thumbnails = data.rows.map(row => ({
+            id: row.thumbnail,
+            src: `/images/thumbnails/${row.thumbnail}`,
+            link: `/video?vid=${row.vid}`,
+            title: `${row.title}`,
+            profile_picture: row.profile_picture || '/images/Placeholder_Profile_Image.jpg',
+            username: row.username
+        }));
         displayThumbnails(thumbnails);
     }).catch(err => {
         console.log(err);
@@ -63,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
             usernameDisplay.textContent = data.userInfo.username; // Display username
             avatar.src = data.userInfo.profilePicture || '/images/Placeholder_Profile_Image.jpg';
             dropdownMenu.innerHTML = `
+                <a href="/${data.userInfo.username}">Channel</a>
                 <a href="/account">Account</a>
                 <a href="/upload">Upload</a>
                 <a id="logout-link" href="#">Logout</a>
